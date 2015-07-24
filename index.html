@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta charset="utf-8" />
+    <title>SharePoint Org Chart</title>
+    <!-- Third Party Style Sheets -->
+    <link rel="stylesheet" type="text/css" href="lib/foundation/css/foundation.css" />
+    <link rel="stylesheet" type="text/css" href="lib/orgchart/jquery.orgchart.css" />
+    <!-- Our Style Sheets -->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- Third Party JavaScript -->
+    <script src="lib/jquery.js"></script>
+    <script type="text/javascript" src="lib/underscore.js"></script>
+    <script type="text/javascript" src="lib/backbone.js"></script>
+    <script type="text/javascript" src="lib/foundation/js/foundation.min.js"></script>
+    <script type="text/javascript" src="lib/foundation/js/vendor/modernizr.js"></script>
+    <script type="text/javascript" src="lib/orgchart/jquery.orgchart.js"></script>
+</head>
+
+<body>
+    <div class="nav contain-to-grid sticky">
+        <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+                <li class="name">
+                    <h1><a href="#"></a></h1>
+                </li>
+                <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+                <li class="toggle-topbar menu-icon"><a><span>Menu</span></a>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <!-- Right Nav Section -->
+                <ul class="right">
+                    <li class="has-dropdown">
+                        <a>Departments</a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="#"></a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </nav>
+    </div>
+    <div id="main"></div>
+    <!-- TEMPLATES -->
+    <script type="text/template" id="main-template">
+      <div id="org-chart"></div>
+    </script>
+    <script type="text/template" id="person-template">
+        <div class="panel">
+            <h5>This is a regular panel.</h5>
+            <p>It has an easy to override visual style, and is appropriately subdued.</p>
+        </div>
+    </script>
+    <script type="text/template" id="fetchingDataTemplate">
+        <div class="text-center library-message">
+            <p>Fetching data<span class="ellipsis"></span></p>
+        </div>
+    </script>
+    <script type="text/template" id="errorTemplate">
+        <div class="text-center library-message">
+            <h1>Error</h1>
+            <h1 class="subheader">Sorry, but the requested page does not exist :(</h1>
+        </div>
+    </script>
+    <script type="text/javascript" id="noItemsTemplate">
+    </script>
+    <!-- Models -->
+    <script src="js/models/person.js"></script>
+    <!-- Views -->
+    <script src="js/views/person.js"></script>
+    <script src="js/views/person.edit.js"></script>
+    <script src="js/views/orgchart.js"></script>
+    <script src="js/views/fetchingData.js"></script>
+    <script src="js/views/error.js"></script>
+    <script src="js/views/app.js"></script>
+    <!-- Application -->
+    <script src="js/data.js"></script>
+    <script src="js/utility.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <!-- Router -->
+    <script src="js/routes/routes.js"></script>
+    <script>
+    $(document).foundation({});
+    </script>
+</body>
+
+</html>
