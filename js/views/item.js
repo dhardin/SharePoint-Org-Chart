@@ -1,6 +1,6 @@
 var app = app || {};
 
-app.UserView = Backbone.View.extend({
+app.ItemView = Backbone.View.extend({
 	template: _.template($('#item-template').html()),
 
 	events: {

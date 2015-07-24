@@ -1,6 +1,6 @@
 var app = app || {};
 
-app.User = Backbone.Model.extend({
+app.Item = Backbone.Model.extend({
     defaults: {
         name: '',
         email: '',

@@ -1,9 +1,11 @@
 var app = app || {};
 
+
 app.config = {
 	url: 'url to your SharePoint site goes here...',
 	guid: 'guid to your SharePoint list',
 	tryCount: 3,
+	testing: true,
 	property_map: {
 		item: {
 			ows_name: 'name',

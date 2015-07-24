@@ -47,10 +47,10 @@
     </div>
     <div id="main"></div>
     <!-- TEMPLATES -->
-    <script type="text/template" id="main-template">
+    <script type="text/template" id="org-chart-template">
       <div id="org-chart"></div>
     </script>
-    <script type="text/template" id="person-template">
+    <script type="text/template" id="item-template">
         <div class="panel">
             <h5>This is a regular panel.</h5>
             <p>It has an easy to override visual style, and is appropriately subdued.</p>
@@ -70,16 +70,17 @@
     <script type="text/javascript" id="noItemsTemplate">
     </script>
     <!-- Models -->
-    <script src="js/models/person.js"></script>
+    <script src="js/models/item.js"></script>
+    <script src="js/models/library.js"></script>
     <!-- Views -->
-    <script src="js/views/person.js"></script>
-    <script src="js/views/person.edit.js"></script>
-    <script src="js/views/orgchart.js"></script>
+    <script src="js/views/item.js"></script>
+    <script src="js/views/library.js"></script>
     <script src="js/views/fetchingData.js"></script>
     <script src="js/views/error.js"></script>
     <script src="js/views/app.js"></script>
     <!-- Application -->
     <script src="js/data.js"></script>
+    <script src="js/data.test.js"></script>
     <script src="js/utility.js"></script>
     <script src="js/config.js"></script>
     <script src="js/app.js"></script>

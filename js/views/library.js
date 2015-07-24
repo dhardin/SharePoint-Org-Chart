@@ -1,8 +1,9 @@
 var app = app || {};
 
 app.LibraryView = Backbone.View.extend({
-
+    template: _.template($('#org-chart-template').html()),
     initialize: function(options) {
+
         // this.collection.on('add reset remove', function() {
         //      this.render(this.collection);
         //   }, this);
@@ -17,46 +18,52 @@ app.LibraryView = Backbone.View.extend({
 
         };
         this.parent_cache = {};
-        this.itemView = options.itemView;
+        this.parent_id_cache = {};
+        this.$orgchart = this.$('#org-chart');
     },
 
-    addParentToCache: function(parent, item){
+    addModelToParentCache: function(parent, item){
         this.parent_cache[parent] = this.parent_cache[parent] || [];
 
         this.parent_cache[parent].push(item);
-    };
+    },
 
     updateItemParentId: function(parent_id, item){
         item.model.set({parent: parent_id});
-    };
+    },
 
-    setParents = function(){
-        this.collection.each(function(model){
+    setParents : function(collection){
+        var that = this, i;
+        collection = collection || this.collection;
+        collection.each(function(model){
+            var parent = model.get('parent'),
+            name = model.get('name'),
+            id = model.get('id');
+            //check to see if parent id has already been cached
+            if(that.parent_id_cache.hasOwnProperty(parent)){
+               //set models parent id to that in the cache
+               model.set({parent: that.parent_id_cache[parent]}); 
 
+               //add model to parent cache since it could also be a parent
+               that.parent_cache[name] = that.parent_cache[name] || [];
+               that.parent_id_cache[name] = id;
+
+               //update all nodes in parent cache if needed
+               for(i = 0; i < that.parent_cache[parent].length; i++){
+                    that.updateItemParentId(that.parent_id_cache[parent], that.parent_cache[parent][i]);
+               }
+               //empty parent cache array
+               that.parent_cache[parent].length = 0;
+            } else {
+                //add model to parent cache to be updated later
+                that.addModelToParentCache(parent, model);
+            }
         });
-    }
+    },
 
     render: function(collection) {
-        var active_items_arr;
-
-        this.el_html = [];
-
-        this.$el.html('');
         collection = collection || this.collection;
-
-        if (collection.length > 0) {
-            (function(that) {
-                collection.each(function(item) {
-                    that.renderItemHtml(item);
-                });
-            })(this);
-
-            this.$el.html(this.el_html);
-            this.onRenderComplete(this.searchQuery);
-        } else {
-            this.$el.html($('#noItemsTemplate').html());
-        }
-
+        this.$orgchart.orgChart({data: this.collection.toArray()});
         return this;
     },
     onClose: function() {
