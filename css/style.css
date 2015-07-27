@@ -1,3 +1,32 @@
-.node {
-	
+
+div.orgChart tr.lines td.left {
+    float: none  !important;
+     padding: 0;
+}
+
+div.orgChart tr.lines td.right {
+        float: none !important;
+        padding: 0;
+}
+
+#org-chart table {
+	margin: 0;
+	border: 0;
+}
+
+table tr.even, table tr.alt, table tr:nth-of-type(even) {
+	background-color: inherit;
+}
+
+
+div.orgChart tr.lines td.top {
+    border-top            : 1px solid black;
+}
+
+div.orgChart tr.lines td.left {
+    border-right          : 1px solid black;
+}
+
+div.orgChart tr.lines td.right {
+    border-left           : 0px solid black;
 }

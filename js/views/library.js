@@ -19,7 +19,8 @@ app.LibraryView = Backbone.View.extend({
         };
         this.parent_cache = {};
         this.parent_id_cache = {};
-        this.$orgchart = this.$('#org-chart');
+
+        this.collection = app.ItemCollection;
     },
 
     addModelToParentCache: function(parent, item){
@@ -62,8 +63,10 @@ app.LibraryView = Backbone.View.extend({
     },
 
     render: function(collection) {
+              this.$el.html(this.template());
+        this.$orgchart = this.$('#org-chart');
         collection = collection || this.collection;
-        this.$orgchart.orgChart({data: this.collection.toArray()});
+        this.$orgchart.orgChart({data: this.collection.map(function(model){return model.attributes;})});
         return this;
     },
     onClose: function() {
