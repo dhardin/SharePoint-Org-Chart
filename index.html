@@ -37,7 +37,10 @@
                         <a>Departments</a>
                         <ul class="dropdown">
                             <li>
-                                <a href="#"></a>
+                                <a href="#">Plumbing</a>
+                            </li>
+                            <li>
+                                <a href="#">Electrical</a>
                             </li>
                         </ul>
                     </li>
@@ -57,7 +60,7 @@
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
             <h5><%=name%></h5>
-            <h5 class="subheader"><%=department%></h5>
+            <h5 class="subheader"><a href="#/<%=department%>"><%=department%></a></h5>
              <h6 class="subheader"><%=title%></h6>
             <!--<a href="#" data-reveal-id="myModal">Details</a>-->
         </div>
