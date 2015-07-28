@@ -1,32 +1,49 @@
+div.orgChart table {
+    border: 0;
+    margin: 0;
+}
+
+div.orgChart div.node {
+    width: auto;
+    height: auto;
+    padding: 1em;
+    cursor: pointer;
+}
+
+div.orgChart div.node:hover {
+    border: 1px solid #aaa;
+}
+
 
 div.orgChart tr.lines td.left {
-    float: none  !important;
-     padding: 0;
+    float: none !important;
+    padding: 0;
 }
 
 div.orgChart tr.lines td.right {
-        float: none !important;
-        padding: 0;
+    float: none !important;
+    padding: 0;
 }
 
 #org-chart table {
-	margin: 0;
-	border: 0;
+    margin: 0;
+    border: 0;
 }
 
-table tr.even, table tr.alt, table tr:nth-of-type(even) {
-	background-color: inherit;
+table tr.even,
+table tr.alt,
+table tr:nth-of-type(even) {
+    background-color: inherit;
 }
-
 
 div.orgChart tr.lines td.top {
-    border-top            : 1px solid black;
+    border-top: 1px solid black;
 }
 
 div.orgChart tr.lines td.left {
-    border-right          : 1px solid black;
+    border-right: 1px solid black;
 }
 
 div.orgChart tr.lines td.right {
-    border-left           : 0px solid black;
+    border-left: 0px solid black;
 }

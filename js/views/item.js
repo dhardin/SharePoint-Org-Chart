@@ -1,29 +1,26 @@
 var app = app || {};
 
 app.ItemView = Backbone.View.extend({
-	template: _.template($('#item-template').html()),
+    template: _.template($('#item-template').html()),
 
-	events: {
-		'click a': 'select'
-	},
+    events: {
 
-	initialize: function (options) {
+        'change': 'render',
+        'click a[data-reveal-id="myModal"]': 'select',
+        'click .node': 'select'
+    },
 
-	},
+    initialize: function(options) {
+        this.model.on('change', this.render, this);
+    },
 
-	select: function(e){
-		e.stopPropagation();
-		Backbone.pubSub.trigger('user:select', this.model);
-	},
-	edit: function(e){
-		var username = this.model.get('loginname');
-		app_router.navigate('edit/user/' + username, { trigger: false });
-	},
+    select: function(e) {
+        Backbone.pubSub.trigger('showModal', this.model);
+    },
 
-	render: function () {
-		this.$el.html(this.template(this.model.toJSON()));
-		this.$el.attr('role', 'presentation');
+    render: function() {
+        this.$el.html(this.template(this.model.toJSON()));
 
-		return this;
-	}
+        return this;
+    }
 });

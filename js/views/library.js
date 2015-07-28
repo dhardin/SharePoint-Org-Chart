@@ -3,58 +3,60 @@ var app = app || {};
 app.LibraryView = Backbone.View.extend({
     template: _.template($('#org-chart-template').html()),
     initialize: function(options) {
+        this.collection = app.ItemCollection;
+        this.collection.on('add reset remove', function() {
+            this.render(this.collection);
+        }, this);
 
-        // this.collection.on('add reset remove', function() {
-        //      this.render(this.collection);
-        //   }, this);
+        Backbone.pubSub.on('showModal', this.showModal, this);
 
-        Backbone.pubSub.on('library:search', this.search, this);
-        Backbone.pubSub.on('add', this.addItems, this);
-        Backbone.pubSub.on('remove', this.removeItems, this);
-        Backbone.pubSub.on('view:reset', this.reset, this);
-        Backbone.pubSub.on('modify', this.modifyItems, this);
 
-        this.updateParents = function(){
+        this.updateParents = function() {
 
         };
         this.parent_cache = {};
         this.parent_id_cache = {};
 
-        this.collection = app.ItemCollection;
+
     },
 
-    addModelToParentCache: function(parent, item){
+    addModelToParentCache: function(parent, item) {
         this.parent_cache[parent] = this.parent_cache[parent] || [];
 
         this.parent_cache[parent].push(item);
     },
 
-    updateItemParentId: function(parent_id, item){
-        item.model.set({parent: parent_id});
+    updateItemParentId: function(parent_id, item) {
+        item.model.set({
+            parent: parent_id
+        });
     },
 
-    setParents : function(collection){
-        var that = this, i;
+    setParents: function(collection) {
+        var that = this,
+            i;
         collection = collection || this.collection;
-        collection.each(function(model){
+        collection.each(function(model) {
             var parent = model.get('parent'),
-            name = model.get('name'),
-            id = model.get('id');
+                name = model.get('name'),
+                id = model.get('id');
             //check to see if parent id has already been cached
-            if(that.parent_id_cache.hasOwnProperty(parent)){
-               //set models parent id to that in the cache
-               model.set({parent: that.parent_id_cache[parent]}); 
+            if (that.parent_id_cache.hasOwnProperty(parent)) {
+                //set models parent id to that in the cache
+                model.set({
+                    parent: that.parent_id_cache[parent]
+                });
 
-               //add model to parent cache since it could also be a parent
-               that.parent_cache[name] = that.parent_cache[name] || [];
-               that.parent_id_cache[name] = id;
+                //add model to parent cache since it could also be a parent
+                that.parent_cache[name] = that.parent_cache[name] || [];
+                that.parent_id_cache[name] = id;
 
-               //update all nodes in parent cache if needed
-               for(i = 0; i < that.parent_cache[parent].length; i++){
+                //update all nodes in parent cache if needed
+                for (i = 0; i < that.parent_cache[parent].length; i++) {
                     that.updateItemParentId(that.parent_id_cache[parent], that.parent_cache[parent][i]);
-               }
-               //empty parent cache array
-               that.parent_cache[parent].length = 0;
+                }
+                //empty parent cache array
+                that.parent_cache[parent].length = 0;
             } else {
                 //add model to parent cache to be updated later
                 that.addModelToParentCache(parent, model);
@@ -63,11 +65,95 @@ app.LibraryView = Backbone.View.extend({
     },
 
     render: function(collection) {
-              this.$el.html(this.template());
+        var modelAttributArr, that = this;
+
+        this.$el.html(this.template());
         this.$orgchart = this.$('#org-chart');
+        this.$modal = this.$('.reveal-modal');
+        this.$el.addClass('orgChart');
         collection = collection || this.collection;
-        this.$orgchart.orgChart({data: this.collection.map(function(model){return model.attributes;})});
+        modelAttributArr = this.collection.map(function(model) {
+            return model.attributes;
+        });
+        this.$orgchart.orgChart({
+            data: modelAttributArr,
+            render: function(node, opts) {
+                that.$el.html(that.buildTable(node, opts));
+            }
+        });
         return this;
+    },
+
+    buildTable: function(node, opts) {
+        var childLength = node.children.length,
+            mainTable, nodeColSpan, downLineTable, linesCols, i, $tr, $td,
+            $table = $('<table cellpadding="0" cellspacing="0" border="0">');
+
+        //   mainTable = "<table cellpadding='0' cellspacing='0' border='0'>";
+        nodeColspan = childLength > 0 ? 2 * childLength : 2;
+        $tr = $('<tr>');
+        $td = $("<td colspan='" + nodeColspan + "'>");
+        $tr.append($td);
+        $td.append(this.renderItem(node.data.id));
+        $table.append($tr);
+
+        if (childLength > 0) {
+            downLineTable = "<table cellpadding='0' cellspacing='0' border='0'><tr class='lines x'><td class='line left half'></td><td class='line right half'></td></table>";
+            $table.append("<tr class='lines'><td colspan='" + childLength * 2 + "'>" + downLineTable + '</td></tr>');
+
+            linesCols = '';
+            for (i = 0; i < childLength; i++) {
+                if (childLength == 1) {
+                    linesCols += "<td class='line left half'></td>"; // keep vertical lines aligned if there's only 1 child
+                } else if (i == 0) {
+                    linesCols += "<td class='line left'></td>"; // the first cell doesn't have a line in the top
+                } else {
+                    linesCols += "<td class='line left top'></td>";
+                }
+
+                if (childLength == 1) {
+                    linesCols += "<td class='line right half'></td>";
+                } else if (i == childLength - 1) {
+                    linesCols += "<td class='line right'></td>";
+                } else {
+                    linesCols += "<td class='line right top'></td>";
+                }
+            }
+            $table.append("<tr class='lines v'>" + linesCols + "</tr>");
+
+            $tr = $("<tr>");
+
+            for (i in node.children) {
+                $td = $('<td colspan="2">');
+                $td.append(this.buildTable(node.children[i], opts));
+                $tr.append($td);
+            }
+
+            $table.append($tr);
+        }
+        return $table;
+    },
+
+    setItemViews: function() {
+        this.collection.each(function(model) {
+            var itemView = new app.ItemView({
+                model: model
+            });
+
+            itemView.setElement($('[node-id="' + model.get('id') + '"]'));
+        });
+    },
+    renderItem: function(id) {
+        var model = this.collection.get(id);
+        if (!model) {
+            return;
+        }
+        var itemView = new app.ItemView({
+            model: model
+        });
+
+
+        return itemView.render().el;
     },
     onClose: function() {
         _.each(this.childViews, function(childView) {
@@ -85,7 +171,7 @@ app.LibraryView = Backbone.View.extend({
         Backbone.pubSub.off('modify');
     },
     renderItems: function(modelsArr, index, currentSearchNum, highlightSearch, regex) {
-        
+
         if (this.searchNum != currentSearchNum) {
             return;
         }
@@ -113,23 +199,6 @@ app.LibraryView = Backbone.View.extend({
         });
         this.el_html.push(itemView.render().el);
     },
-    renderItem: function(item, highlightSearch, regex) {
-        var itemView = new this.itemView({
-                model: item
-            }),
-            itemViewEl = itemView.render().el,
-            $searchEl = $(itemViewEl).find('.list-item');
-
-        if (highlightSearch && regex) {
-            (function(that) {
-                $searchEl.each(function() {
-                    that.highlightSearchPhrase($(this), that.searchQuery, regex);
-                });
-            })(this);
-        }
-
-        this.$el.append(itemViewEl);
-    },
     renderFiltered: function(collection) {
         var numActiveItems = 0,
             totalItems = 0,
@@ -148,9 +217,9 @@ app.LibraryView = Backbone.View.extend({
         if (numItemsDisplayed < totalItems) {
             this.$el.append('<div>Displaying ' + numItemsDisplayed + ' out of ' + totalItems + '</div>');
         }
-         this.searchNum++;
+        this.searchNum++;
         if (collection.length > 0) {
-           
+
             regex = new RegExp(this.searchQuery, 'gi');
             this.renderItems(collection.models, 0, this.searchNum, true, regex);
         }
@@ -208,6 +277,20 @@ app.LibraryView = Backbone.View.extend({
         }
     },
 
+    showModal: function(model) {
+        model = this.collection.get(model);
+        if (!model) {
+            return;
+        }
+        var detailsView = new app.DetailsView({
+            model: model
+        });
+
+
+        this.$modal.find('.content').html(detailsView.render().el);
+        this.$modal.foundation('reveal', 'open');
+    },
+
     search: function(options) {
         var collection = (options && options.collection ? options.collection : this.collection),
             results = [],
@@ -227,7 +310,7 @@ app.LibraryView = Backbone.View.extend({
             this.search_cache[val].models = this.search_cache[val].models || $.extend([], this.collection.models);
             models = this.search_cache[val].models;
             //check to see if current collection is different from cached collection
-            if (!newQuery && _.difference(models,  this.collection.models).length > 0){
+            if (!newQuery && _.difference(models, this.collection.models).length > 0) {
                 this.search_cache[val].models = this.collection.models;
                 results = false;
             } else {

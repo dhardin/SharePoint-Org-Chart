@@ -48,13 +48,58 @@
     <div id="main"></div>
     <!-- TEMPLATES -->
     <script type="text/template" id="org-chart-template">
-      <div id="org-chart"></div>
+        <div id="org-chart"></div>
+        <div class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
+            <div class="content"></div>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
     </script>
     <script type="text/template" id="item-template">
-        <div class="panel">
-            <h5>This is a regular panel.</h5>
-            <p>It has an easy to override visual style, and is appropriately subdued.</p>
+        <div class='node' node-id="<%=id%>">
+            <h5><%=name%></h5>
+            <h5 class="subheader"><%=department%></h5>
+             <h6 class="subheader"><%=title%></h6>
+            <!--<a href="#" data-reveal-id="myModal">Details</a>-->
         </div>
+    </script>
+    <script type="text/template" id="details-item-template">
+        <form>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Name
+                        <input type="text" value="<%=name%>" disabled/>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Email
+                        <input type="text" value="<%=email%>" disabled/>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Phone
+                        <input type="text" value="<%=phone%>" disabled/>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Department
+                        <input type="text" value="<%=department%>" disabled/>
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Title
+                        <input type="text" value="<%=title%>" disabled/>
+                    </label>
+                </div>
+            </div>
+        </form>
     </script>
     <script type="text/template" id="fetchingDataTemplate">
         <div class="text-center library-message">
@@ -74,6 +119,7 @@
     <script src="js/models/library.js"></script>
     <!-- Views -->
     <script src="js/views/item.js"></script>
+     <script src="js/views/details.js"></script>
     <script src="js/views/library.js"></script>
     <script src="js/views/fetchingData.js"></script>
     <script src="js/views/error.js"></script>
