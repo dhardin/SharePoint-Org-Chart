@@ -7,9 +7,9 @@ app.LibraryView = Backbone.View.extend({
         this.collection.on('add reset remove', function() {
             this.render(this.collection);
         }, this);
+        this.department = options.department;
 
         Backbone.pubSub.on('showModal', this.showModal, this);
-
 
         this.updateParents = function() {
 
@@ -72,7 +72,13 @@ app.LibraryView = Backbone.View.extend({
         this.$modal = this.$('.reveal-modal');
         this.$el.addClass('orgChart');
         collection = collection || this.collection;
-        modelAttributArr = this.collection.map(function(model) {
+
+        if(this.department){
+            collection = collection.filter(function(model){
+                return model.get('department').toLowerCase() == that.department.toLowerCase();
+            });
+        }
+        modelAttributArr = collection.map(function(model) {
             return model.attributes;
         });
         this.$orgchart.orgChart({

@@ -24,6 +24,12 @@ app.itemFetchData = function() {
         //initialize data
         app.ItemCollection = new app.Library(data);
         app.state_map.fetched.items = true;
+        //setup navigation items
+        var departments = _.unique(_.pluck(data, 'department'));
+
+        $('.departments').append(departments.reduce(function(previous, current, index, array) {
+            return (index == 1 ? '<li><a href="#'+previous+'">'+previous+'</a></li>' : previous) + '<li><a href="#'+current+'">'+current+'</a></li>';
+        }));
         app.DataFetched();
     }
 };

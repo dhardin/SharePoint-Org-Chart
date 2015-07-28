@@ -3,8 +3,7 @@ var app = app || {};
 var Router = Backbone.Router.extend({
     routes: {
         '': 'orgchart',
-        'view/category/:department': 'orgchart',
-        'view/person/:person': 'person',
+        ':department': 'orgchart',
         'fetch': 'fetch',
         '*404': 'error'
     },
@@ -24,7 +23,7 @@ var Router = Backbone.Router.extend({
         this.AppView.showView(fetchingDataView);
     },
 
-     orgchart: function() {
+     orgchart: function(department) {
         var fetchingDataView, libraryView;
        if (!app.state_map.fetched.items) {
             app.itemFetchData();
@@ -38,7 +37,7 @@ var Router = Backbone.Router.extend({
         }  else {
             library = new app.Library();
         }
-        libraryView = new app.LibraryView();
+        libraryView = new app.LibraryView({department: department});
 
         this.AppView.showView(libraryView);
     }

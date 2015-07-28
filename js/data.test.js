@@ -35,4 +35,32 @@ data = [
 	email: 'ted@pluming.net',
 	phone: '555-555-5555'
 
+},
+{
+	name: 'Phil',
+	department: 'Electrical',
+	parent: 0,
+	title: 'The Electrician',
+	id: 5,
+	email: 'phil@electrical.net',
+	phone: '555-555-5555'
+},
+{
+	name: 'Buzz',
+	department: 'Electrical',
+	parent: 5,
+	title: 'Assistant Electrician',
+	id: 6,
+	email: 'buzz@electrical.net',
+	phone: '555-555-5555'
+
+},{
+	name: 'Sparky',
+	department: 'Electrical',
+	parent: 6,
+	title: 'Assistant to the Assistant Electrician',
+	id: 7,
+	email: 'sparky@electrical.net',
+	phone: '555-555-5555'
+
 }];
