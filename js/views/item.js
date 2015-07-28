@@ -6,7 +6,6 @@ app.ItemView = Backbone.View.extend({
     events: {
 
         'change': 'render',
-        'click a[data-reveal-id="myModal"]': 'select',
         'click .node': 'select'
     },
 
@@ -15,7 +14,9 @@ app.ItemView = Backbone.View.extend({
     },
 
     select: function(e) {
+    	if(e.target.tagName != 'A'){;
         Backbone.pubSub.trigger('showModal', this.model);
+    }
     },
 
     render: function() {

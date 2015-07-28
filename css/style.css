@@ -7,6 +7,10 @@ div.orgChart div.node {
     width: auto;
     height: auto;
     padding: 1em;
+    cursor: help;
+}
+
+div.orgChart div.node a {
     cursor: pointer;
 }
 

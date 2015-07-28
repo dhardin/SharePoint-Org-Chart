@@ -2,7 +2,7 @@ data = [
 {
 	name: 'Bob',
 	department: 'Plumbing',
-	parent: 0,
+	parent: 5,
 	title: 'The Plumber',
 	id: 1,
 	email: 'bob@pluming.net',
