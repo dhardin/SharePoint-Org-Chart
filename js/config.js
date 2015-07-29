@@ -6,6 +6,7 @@ app.config = {
 	guid: 'guid to your SharePoint list',
 	tryCount: 3,
 	testing: true,
+	editing: false,
 	property_map: {
 		item: {
 			ows_name: 'name',

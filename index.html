@@ -55,9 +55,14 @@
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
             <h5><%=name%></h5>
-            <h5 class="subheader"><a href="#<%=department%>"><%=department%></a></h5>
+            <h5 class="subheader"><a href="#department/<%=department%>"><%=department%></a></h5>
             <h6 class="subheader"><%=title%></h6>
-            <!--<a href="#" data-reveal-id="myModal">Details</a>-->
+            <% if(app.config.editing){%>
+                <div class="context vcard">
+                    <a class="add">Add</a>
+                    <a class="delete <%=(children.length > 0 ? 'disabled' : '')%>">Delete</a>
+                </div>
+                <%}%>
         </div>
     </script>
     <script type="text/template" id="details-item-template">
@@ -65,38 +70,42 @@
             <div class="row">
                 <div class="large-12 columns">
                     <label>Name
-                        <input type="text" value="<%=name%>" disabled/>
+                        <input type="text" class="name" value="<%=name%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
                     </label>
                 </div>
             </div>
             <div class="row">
                 <div class="large-12 columns">
                     <label>Email
-                        <input type="text" value="<%=email%>" disabled/>
+                        <input type="email" class="email" value="<%=email%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
                     </label>
                 </div>
             </div>
             <div class="row">
                 <div class="large-12 columns">
                     <label>Phone
-                        <input type="text" value="<%=phone%>" disabled/>
+                        <input type="tel" class="phone" value="<%=phone%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
                     </label>
                 </div>
             </div>
             <div class="row">
                 <div class="large-12 columns">
                     <label>Department
-                        <input type="text" value="<%=department%>" disabled/>
+                        <input type="text" class="department" value="<%=department%>" <%=( app.config.editing ? '' : 'disabled' ) %>/>
                     </label>
                 </div>
             </div>
             <div class="row">
                 <div class="large-12 columns">
                     <label>Title
-                        <input type="text" value="<%=title%>" disabled/>
+                        <input type="text" class="title" value="<%=title%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
                     </label>
                 </div>
             </div>
+            <% if(app.config.editing){%>
+                <a class="button save">Save</a>
+                <a class="button close-reveal-modal">Cancel</a>
+                <%}%>
         </form>
     </script>
     <script type="text/template" id="fetchingDataTemplate">
@@ -132,6 +141,16 @@
     <script src="js/routes/routes.js"></script>
     <script>
     $(document).foundation({});
+    $('body').on('click', function(e) {
+        $('.context').hide();
+    }).on('contextmenu', function(e) {
+        var $node = $(e.target).hasClass('node') ? $(e.target) : $(e.target).parents('.node');
+        $('.context').each(function(){
+            if($(this).parents('.node')[0] != $node[0]){
+                $(this).hide();
+            }
+        });
+    });
     </script>
 </body>
 

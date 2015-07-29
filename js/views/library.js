@@ -10,13 +10,35 @@ app.LibraryView = Backbone.View.extend({
         this.department = options.department;
 
         Backbone.pubSub.on('showModal', this.showModal, this);
-
-        this.updateParents = function() {
-
-        };
+        Backbone.pubSub.on('add', this.addModel, this);
+        Backbone.pubSub.on('delete', this.deleteModel, this);
         this.parent_cache = {};
         this.parent_id_cache = {};
 
+        this.setParentChildren();
+    },
+
+    addModel: function(parent) {
+        var model = {
+            name: '',
+            parent: parent.get('id'),
+            department: parent.get('department'),
+            title: ''
+        };
+        model = this.collection.add(model);
+        model.set('id', model.get('id').length > 0 ? model.get('id') : model.cid);
+        parent.set({children: parent.get('children').concat(model) });
+        this.showModal(model);
+
+
+    },
+
+    deleteModel: function(model) {
+        var parent = this.collection.get({id: model.get('parent')});
+         parent.set({children: _.reject(parent.get('children'), function(child){
+            return child === model;
+         })});
+        this.collection.remove(model);
 
     },
 
@@ -73,8 +95,8 @@ app.LibraryView = Backbone.View.extend({
         this.$el.addClass('orgChart');
         collection = collection || this.collection;
 
-        if(this.department){
-            collection = collection.filter(function(model){
+        if (this.department) {
+            collection = collection.filter(function(model) {
                 return model.get('department').toLowerCase() == that.department.toLowerCase();
             });
         }
@@ -88,6 +110,15 @@ app.LibraryView = Backbone.View.extend({
             }
         });
         return this;
+    },
+
+    setParentChildren: function() {
+        var that = this;
+        this.collection.each(function(model) {
+            model.set('children', that.collection.where({
+                parent: model.get('id')
+            }));
+        });
     },
 
     buildTable: function(node, opts) {

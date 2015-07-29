@@ -51,3 +51,45 @@ div.orgChart tr.lines td.left {
 div.orgChart tr.lines td.right {
     border-left: 0px solid black;
 }
+
+.add, .delete{
+    line-height: normal;
+    display: block;
+    padding: 0.5em;
+}
+
+.add:hover, .delete:hover {
+    background-color: #eee;
+}
+
+.button.close-reveal-modal {
+        font-size:  inherit;
+     line-height:  normal;
+    position:  relative; 
+     top:  inherit;
+    right:  inherit;
+     color:  #fff;
+    font-weight:  normal;
+    cursor:  inherit;
+}
+
+.red{
+    color: #cf2a0e;
+}
+
+.green {
+    color: #43AC6A;
+}
+
+
+.context {
+    position: absolute;
+    display: none;
+    background-color: #fff;
+    text-align: left;
+    padding: 0;
+}
+
+.context .disabled {
+    color: #eee;
+}

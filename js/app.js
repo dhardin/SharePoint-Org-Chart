@@ -28,7 +28,7 @@ app.itemFetchData = function() {
         var departments = _.unique(_.pluck(data, 'department'));
 
         $('.departments').append(departments.reduce(function(previous, current, index, array) {
-            return (index == 1 ? '<li><a href="#'+previous+'">'+previous+'</a></li>' : previous) + '<li><a href="#'+current+'">'+current+'</a></li>';
+            return (index == 1 ? '<li><a href="#department/'+previous+'">'+previous+'</a></li>' : previous) + '<li><a href="#department/'+current+'">'+current+'</a></li>';
         }));
         app.DataFetched();
     }

@@ -9,7 +9,8 @@ app.Item = Backbone.Model.extend({
         id: '',
         parent: '',
         phone: '',
-        department: ''
+        department: '',
+        children: []
     },
     initialize: function(){
         if(this.get('name').length == 0 && this.get('firstName').length > 0){
