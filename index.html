@@ -60,6 +60,8 @@
             <% if(app.config.editing){%>
                 <div class="context vcard">
                     <a class="add">Add</a>
+                     <a class="edit">Edit</a>
+                    <a class="move">Move</a>
                     <a class="delete <%=(children.length > 0 ? 'disabled' : '')%>">Delete</a>
                 </div>
                 <%}%>
@@ -145,8 +147,8 @@
         $('.context').hide();
     }).on('contextmenu', function(e) {
         var $node = $(e.target).hasClass('node') ? $(e.target) : $(e.target).parents('.node');
-        $('.context').each(function(){
-            if($(this).parents('.node')[0] != $node[0]){
+        $('.context').each(function() {
+            if ($(this).parents('.node')[0] != $node[0]) {
                 $(this).hide();
             }
         });

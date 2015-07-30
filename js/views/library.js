@@ -4,7 +4,7 @@ app.LibraryView = Backbone.View.extend({
     template: _.template($('#org-chart-template').html()),
     initialize: function(options) {
         this.collection = app.ItemCollection;
-        this.collection.on('add reset remove', function() {
+        this.collection.on('add reset remove change', function() {
             this.render(this.collection);
         }, this);
         this.department = options.department;
