@@ -27,8 +27,6 @@ app.ItemView = Backbone.View.extend({
             left: e.offsetX,
             top: e.offsetY
         });
-        $('<div class="reveal-modal-bg context-bg">').appendTo('body').show();
-
     },
 
     selectParent: function(model) {
@@ -45,7 +43,7 @@ app.ItemView = Backbone.View.extend({
 
     select: function(e) {
         if (!e || $(e.target).parent('.context').length == 0) {
-            if (!this.listening) {
+            if (!this.listening || (e && e.target.className !== 'subheader' && $(e.target).parent('.subheader').length == 0)) {
                 this.closeContext();
                 Backbone.pubSub.trigger('showModal', this.model);
             } else {

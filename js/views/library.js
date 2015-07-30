@@ -106,7 +106,7 @@ app.LibraryView = Backbone.View.extend({
         this.$orgchart.orgChart({
             data: modelAttributArr,
             render: function(node, opts) {
-                that.$el.html(that.buildTable(node, opts));
+                that.$el.append(that.buildTable(node, opts));
             }
         });
         return this;

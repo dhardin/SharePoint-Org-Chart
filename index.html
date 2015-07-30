@@ -51,6 +51,17 @@
             <div class="content"></div>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
+        <% if(app.config.editing){%>
+            <div class="instructions">
+                <p>
+                    <kbd>Left Click</kbd> node to edit
+                    <br>
+                    <kbd>Left Click</kbd> node <strong>Department</strong> to apply filter
+                    <br>
+                    <kbd>Right Click</kbd> node for context menu
+                </p>
+            </div>
+            <%}%>
     </script>
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
@@ -60,7 +71,7 @@
             <% if(app.config.editing){%>
                 <div class="context vcard">
                     <a class="add">Add</a>
-                     <a class="edit">Edit</a>
+                    <a class="edit">Edit</a>
                     <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
                     <a class="<%=(children.length > 0 ? 'disabled' : 'delete')%>">Delete</a>
                 </div>
