@@ -27,6 +27,7 @@ app.ItemView = Backbone.View.extend({
             left: e.offsetX,
             top: e.offsetY
         });
+        $('<div class="reveal-modal-bg context-bg">').appendTo('body').show();
 
     },
 
@@ -34,32 +35,40 @@ app.ItemView = Backbone.View.extend({
         if (this.dragging) {
             if (this.model.get('parent') != 0) {
                 this.model.set('parent', model.get('id'));
+                this.$node.removeClass('moving');
             }
             this.dragging = false;
             this.$draggable.remove();
+               $('body').off('mousemove, click').css({'cursor': 'auto'});
         }
     },
 
     select: function(e) {
         if (!e || $(e.target).parent('.context').length == 0) {
             if (!this.listening) {
+                this.closeContext();
                 Backbone.pubSub.trigger('showModal', this.model);
             } else {
                 Backbone.pubSub.trigger('select', this.model);
                 this.listening = false;
+                this.$node.removeClass('listen');
             }
-        }
+        } 
 
     },
 
-      edit: function(e) {
-        this.select();
+    closeContext: function(e) {
         this.$context.hide();
+        $('.context-bg').remove();
+    },
+    edit: function(e) {
+        this.select();
+        this.closeContext();
     },
 
     add: function(e) {
         Backbone.pubSub.trigger('add', this.model);
-        this.$context.hide();
+        this.closeContext();
     },
 
 
@@ -68,19 +77,22 @@ app.ItemView = Backbone.View.extend({
             return;
         }
         Backbone.pubSub.trigger('delete', this.model);
-        this.$context.hide();
+        this.closeContext();
     },
 
     listen: function(model) {
         if (model != this.model) {
             this.listening = true;
+            this.$node.addClass('listen');
+        } else {
+            this.$node.addClass('moving');
         }
     },
 
     move: function(e) {
         var $draggable, that = this;
 
-        this.$context.hide();
+        this.closeContext();
         this.$draggable = $('<div class="draggable">' + this.$el.html() + '</div>');
         $('body').append(this.$draggable);
         this.dragging = true;
@@ -92,15 +104,16 @@ app.ItemView = Backbone.View.extend({
             that.$draggable.css({
                 left: e.pageX + 2,
                 top: e.pageY + 2
-            }).on('click', function(e) {
-                $('body').off('mousemove, click');
             });
+        }).css({
+            'cursor': '-webkit-grabbing'
         });
     },
 
     render: function() {
         this.$el.html(this.template(this.model.toJSON()));
         this.$context = this.$('.context');
+        this.$node = this.$('.node');
         this.dragging = false;
         Backbone.pubSub.on('context', this.showContext, this);
         Backbone.pubSub.on('select', this.selectParent, this);
