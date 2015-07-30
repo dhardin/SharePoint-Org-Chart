@@ -61,8 +61,8 @@
                 <div class="context vcard">
                     <a class="add">Add</a>
                      <a class="edit">Edit</a>
-                    <a class="move">Move</a>
-                    <a class="delete <%=(children.length > 0 ? 'disabled' : '')%>">Delete</a>
+                    <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
+                    <a class="<%=(children.length > 0 ? 'disabled' : 'delete')%>">Delete</a>
                 </div>
                 <%}%>
         </div>

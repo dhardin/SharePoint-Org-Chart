@@ -10,6 +10,7 @@ app.ItemView = Backbone.View.extend({
         'click .add': 'add',
         'click .delete': 'delete',
         'click .move': 'move',
+        'click .edit': 'edit',
         contextmenu: 'contextmenu'
     },
 
@@ -31,14 +32,16 @@ app.ItemView = Backbone.View.extend({
 
     selectParent: function(model) {
         if (this.dragging) {
-            this.model.set('parent', model.get('id'));
+            if (this.model.get('parent') != 0) {
+                this.model.set('parent', model.get('id'));
+            }
             this.dragging = false;
             this.$draggable.remove();
         }
     },
 
     select: function(e) {
-        if (e.target.className.indexOf('add') == -1 && e.target.className.indexOf('delete') == -1 && e.target.className.indexOf('move') == -1) {
+        if (!e || $(e.target).parent('.context').length == 0) {
             if (!this.listening) {
                 Backbone.pubSub.trigger('showModal', this.model);
             } else {
@@ -47,6 +50,11 @@ app.ItemView = Backbone.View.extend({
             }
         }
 
+    },
+
+      edit: function(e) {
+        this.select();
+        this.$context.hide();
     },
 
     add: function(e) {
