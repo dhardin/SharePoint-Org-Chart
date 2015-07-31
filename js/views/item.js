@@ -56,10 +56,12 @@ app.ItemView = Backbone.View.extend({
     select: function(e) {
         //  e.preventDefault();
         if (!e || $(e.target).parent('.context').length == 0) {
-            if (!this.listening) {
+            if (!this.listening && !this.dragging) {
                 this.closeContext();
                 Backbone.pubSub.trigger('showModal', this.model);
-            } else {
+            } else if(this.dragging){
+                Backbone.pubSub.trigger('done');
+            }else {
                 Backbone.pubSub.trigger('select', this.model);
             }
         }
@@ -148,9 +150,10 @@ app.ItemView = Backbone.View.extend({
             this.$draggable.remove();
             this.$draggable = false;
         }
-        $('body').off('mousemove, click').css({
+        $('body').off('mousemove').css({
             'cursor': 'auto'
         });
+         $(document).off('keyup');
     },
 
     render: function() {

@@ -4,7 +4,7 @@ app.LibraryView = Backbone.View.extend({
     template: _.template($('#org-chart-template').html()),
     initialize: function(options) {
         this.collection = app.ItemCollection;
-        this.collection.on('add reset remove change', function() {
+        this.collection.on('add reset remove', function() {
             this.render(this.collection);
         }, this);
         this.department = options.department;
@@ -12,6 +12,7 @@ app.LibraryView = Backbone.View.extend({
         Backbone.pubSub.on('showModal', this.showModal, this);
         Backbone.pubSub.on('add', this.addModel, this);
         Backbone.pubSub.on('delete', this.deleteModel, this);
+         Backbone.pubSub.on('done', this.render, this);
         this.parent_cache = {};
         this.parent_id_cache = {};
 
