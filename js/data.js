@@ -10,629 +10,318 @@
 //
 var app = app || {};
 
-app.data = (function() {
+app.spData = (function(){
     var stateMap = {
-            dataArr: [],
-            currentDataArrIndex: 0
-        },
-        printError, getPermissions, getUsers, addUserToGroup, removeUserFromGroup, modifyPermissions, removeUserFromWeb;
+        dataArr: [],
+        currentDataArrIndex: 0
+    },
+    getData, _getListItems, processData, saveData, _saveListItem, printError;
 
-    // Begin Utility Method /printError/
-    printError = function(XMLHttpRequest, textStatus, errorThrown) {
-        console.log("There was an error: " + errorThrown + " " + textStatus);
-        console.log(XMLHttpRequest.responseText);
-    };
-    // End Utility Method /printError/
+    getData = function(dataArr, index, callback){
+        var url, guid, viewName, type, dataCallback;
 
-    // Begin Utility Method /getPermissions/
-    //returns an object of all permissions and
-    //their values equal to whether or not the user has
-    //the permission
-    getPermissions = function(url, username, callback) {
-        var results = [],
-            soapEnv, body, soapAction;
-
-        username = username.replace('/', '\\');
-
-        if (username) {
-            body = '<GetGroupCollectionFromUser xmlns="http://schemas.microsoft.com/sharepoint/soap/directory/">\
-                        <userLoginName>' + username + '</userLoginName>\
-                      </GetGroupCollectionFromUser>';
-            soapAction = "http://schemas.microsoft.com/sharepoint/soap/directory/GetGroupCollectionFromUser";
-        } else {
-            body = ' <GetGroupCollectionFromSite xmlns="http://schemas.microsoft.com/sharepoint/soap/directory/" />';
-            soapAction = "http://schemas.microsoft.com/sharepoint/soap/directory/GetGroupCollectionFromSite";
+        if(!dataArr instanceof Array){
+            return;
+        }
+        if (index > dataArr.length){
+            return;
         }
 
-        soapEnv =
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\
-                     <soap:Body>\
-                    ' + body + '\
-                    </soap:Body>\
-                </soap:Envelope>';
-
+        //get options for current index
+        url = dataArr[index].url;
         //data calls assume url ends with '/'
         //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
+        if(!url.endsWith('/')){
             url = url + '/';
         }
 
-        $.ajax({
-            url: url + "_vti_bin/UserGroup.asmx",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', soapAction);
-            },
-            type: "POST",
-            dataType: "xml",
-            data: soapEnv,
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                printError(XMLHttpRequest, textStatus, errorThrown)
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    //try again
-                    $.ajax(this);
-                    return;
-                }
-            },
-            complete: function(xData, status) {
-                results = $(xData.responseText).find("group");
+        guid = dataArr[index].guid;
+        type = dataArr[index].type;
+        dataCallback = dataArr[index].callback;
 
-                if (callback) {
-                    callback(results);
+        stateMap.dataArr = dataArr;
+        stateMap.currentDataArrIndex = index || 0;
+
+        _getListItems(url, guid, type, function (results) {
+            if (dataCallback){
+                dataCallback(results);
+            }
+            if (index < dataArr.length - 1) {
+                getData(dataArr, ++index, callback);
+            } else if(index == dataArr.length){
+                if(callback){
+                    callback();
                 }
-            },
-            contentType: "text/xml; charset=\"utf-8\""
+            }
         });
+
     };
-    // End Utility Method /getPermissions/
 
-    // Begin Utility Method /getUsers/
-    //returns a list of users from a site
-    getUsers = function(url, callback) {
-        var results = [],
+     // Begin Utility Method /_getListItems/
+    _getListItems = function (url, guid, type, callback) {
+        var results = [], soapEnv, body;
 
-            // Create the SOAP request
-            soapEnv =
+        soapEnv =
             '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\
                 <soap:Body>\
-                  <GetUserCollectionFromSite xmlns="http://schemas.microsoft.com/sharepoint/soap/" />\
+                    <GetListItems xmlns="http://schemas.microsoft.com/sharepoint/soap/">\
+                        <listName>'+guid+'</listName>\
+                    </GetListItems>\
                 </soap:Body>\
             </soap:Envelope>';
 
-        //data calls assume url ends with '/'
-        //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
-            url = url + '/';
-        }
 
 
         $.ajax({
-            url: url + "_vti_bin/UserGroup.asmx",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', "http://schemas.microsoft.com/sharepoint/soap/directory/GetUserCollectionFromSite");
+            url: url + "_vti_bin/lists.asmx",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('SOAPAction', 'http://schemas.microsoft.com/sharepoint/soap/GetListItems');
             },
             type: "POST",
             dataType: "xml",
+            contentType: "text/xml; charset=\"utf-8\"",
             data: soapEnv,
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                printError(XMLHttpRequest, textStatus, errorThrown)
+            tryCount: 3,
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                printError(XMLHttpRequest, textStatus, errorThrown);
                 this.tryCount++;
                 if (this.tryCount <= this.retryLimit) {
                     //try again
                     $.ajax(this);
                     return;
                 } else if (callback) {
-                    callback({
-                        type: 'error',
-                        data: {
-                            status: textStatus,
-                            error: errorThrown
-                        }
-                    });
+                    callback(textStatus);
                 }
             },
-            complete: function(xData, status) {
-                results = $(xData.responseText).find("user");
+            complete: function (xData, status) {
+                var responseProperty = (xData.responseText ? 'responseText' : 'responseXML'),
+                 results = $(xData[responseProperty]).find('z\\:row');
 
                 if (callback) {
                     callback(results);
                 }
-            },
-            contentType: "text/xml; charset=\"utf-8\""
-        });
-    };
-    // End Utility Method /getUsers/
-
-    // Begin utility method /getUsersFromGroup/
-    // Begin Utility Method /getUsers/
-    //returns a list of users from a site
-    getUsersFromGroup = function(url, group, callback) {
-        var results = [],
-
-            // Create the SOAP request
-            soapEnv =
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\
-                <soap:Body>\
-                   <GetUserCollectionFromGroup xmlns="http://schemas.microsoft.com/sharepoint/soap/directory/">\
-                    <groupName>' + group + '</groupName>\
-                  </GetUserCollectionFromGroup>\
-              </soap:Body>\
-            </soap:Envelope>';
-
-        //data calls assume url ends with '/'
-        //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
-            url = url + '/';
-        }
-
-        $.ajax({
-            url: url + "_vti_bin/UserGroup.asmx",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', "http://schemas.microsoft.com/sharepoint/soap/directory/GetUserCollectionFromGroup");
-            },
-            type: "POST",
-            dataType: "xml",
-            data: soapEnv,
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                printError(XMLHttpRequest, textStatus, errorThrown)
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    //try again
-                    $.ajax(this);
-                    return;
-                } else if (callback) {
-                    callback({
-                        type: 'error',
-                        data: {
-                            status: textStatus,
-                            error: errorThrown
-                        }
-                    });
-                }
-            },
-            complete: function(xData, status) {
-                results = $(xData.responseText).find("user");
-
-                if (callback) {
-                    callback(results);
-                }
-            },
-            contentType: "text/xml; charset=\"utf-8\""
-        });
-    };
-    // End Utility Method /getUsers/
-    // End utility method /getUsersFromGroup/
-    // Begin Utility Method /modifyPermissions/
-    modifyPermissions = function(permissionArr, index, user, url, operation, callback) {
-        var permission;
-
-        if (!(permissionArr instanceof Array)) {
-            return false;
-        }
-        if (index < permissionArr.length) {
-            permission = permissionArr[index];
-            index++;
-            switch (operation) {
-                case 'add':
-                    addUserToGroup(url, permission, user, function(results) {
-                        if (callback) {
-                            callback({
-                                operation: operation,
-                                type: results.type,
-                                data: results.data,
-                                permission: permission
-                            });
-                        }
-                        modifyPermissions(permissionArr, index, user, url, operation, callback);
-                    });
-                    break;
-                case 'remove':
-                    removeUserFromGroup(url, permission, user, function(results) {
-                        if (callback) {
-                            callback({
-                                operation: operation,
-                                type: results.type,
-                                data: results.data,
-                                permission: permission
-                            });
-                        }
-                        modifyPermissions(permissionArr, index, user, url, operation, callback);
-                    });
-                    break;
-                default:
-                    break;
-            }
-
-        }
-
-    };
-    // End Utility method /modifyPermissions/
-
-    // Begin Utility Method /modifyUsers/
-    modifyUsers = function(userArr, index, group, url, operation, callback) {
-        var user, groupName = group.name;
-
-        if (!(userArr instanceof Array)) {
-            return false;
-        }
-        if (index < userArr.length) {
-            user = userArr[index];
-            index++;
-            switch (operation) {
-                case 'add':
-                    addUserToGroup(url, groupName, user, function(results) {
-                        if (callback) {
-                            callback({
-                                operation: operation,
-                                type: results.type,
-                                data: results.data,
-                                user: user.name
-                            });
-                        }
-                        modifyUsers(userArr, index, group, url, operation, callback);
-                    });
-                    break;
-                case 'remove':
-                    removeUserFromGroup(url, groupName, user, function(results) {
-                        if (callback) {
-                            callback({
-                                operation: operation,
-                                type: results.type,
-                                data: results.data,
-                                user: user.name
-                            });
-                        }
-                        modifyUsers(userArr, index, group, url, operation, callback);
-                    });
-                    break;
-                default:
-                    break;
-            }
-
-        }
-
-    };
-    // End Utility method /modifyUsers/
-
-    // Begin Utility Method /addUserToGroup/
-    addUserToGroup = function(url, groupName, user, callback) {
-        var results = [],
-            groupName = groupName,
-            name = user.name,
-            login = user.loginname.replace('/', '\\'),
-            email = user.email,
-            description = user.description || '',
-            // Create the SOAP request
-            soapEnv =
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\
-                    <soap:Body>\
-                        <AddUserToGroup xmlns="http://schemas.microsoft.com/sharepoint/soap/directory/">\
-                            <groupName>' + groupName + '</groupName>\
-                            <userName>' + name + '</userName>\
-                            <userLoginName>' + login + '</userLoginName>\
-                            <userEmail>' + email + '</userEmail>\
-                            <userNotes>' + description + '</userNotes>\
-                        </AddUserToGroup>\
-                    </soap:Body>\
-                </soap:Envelope>';
-        //data calls assume url ends with '/'
-        //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
-            url = url + '/';
-        }
-
-        $.ajax({
-            url: url + "_vti_bin/UserGroup.asmx",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', "http://schemas.microsoft.com/sharepoint/soap/directory/AddUserToGroup");
-            },
-            type: "POST",
-            dataType: "xml",
-            data: soapEnv,
-            tryCount: 0,
-            retryLimit: 0,
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                printError(XMLHttpRequest, textStatus, errorThrown)
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    //try again
-                    $.ajax(this);
-                    return;
-                }
-            },
-            complete: function(xData, status) {
-                if (callback) {
-                    callback({
-                        type: (status != 'error' ? 'success' : 'error'),
-                        data: xData
-                    });
-                }
-            },
-            contentType: "text/xml; charset=\"utf-8\""
-        });
-    };
-    // End Utility Method /addUserToGroup/
-
-    // Begin utility method /removeUserFromGroup/
-    removeUserFromGroup = function(url, groupName, user, callback) {
-        var results = [],
-            groupName = groupName,
-            login = user.loginname.replace('/', '\\'),
-            // Create the SOAP request
-            soapEnv =
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\
-                    <soap:Body>\
-                        <RemoveUserFromGroup xmlns="http://schemas.microsoft.com/sharepoint/soap/directory/">\
-                            <groupName>' + groupName + '</groupName>\
-                            <userLoginName>' + login + '</userLoginName>\
-                        </RemoveUserFromGroup>\
-                    </soap:Body>\
-                </soap:Envelope>';
-
-        //data calls assume url ends with '/'
-        //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
-            url = url + '/';
-        }
-
-
-        $.ajax({
-            url: url + "_vti_bin/UserGroup.asmx",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', "http://schemas.microsoft.com/sharepoint/soap/directory/RemoveUserFromGroup");
-            },
-            type: "POST",
-            dataType: "xml",
-            data: soapEnv,
-            tryCount: 0,
-            retryLimit: 0,
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                printError(XMLHttpRequest, textStatus, errorThrown)
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    //try again
-                    $.ajax(this);
-                    return;
-                }
-            },
-            complete: function(xData, status) {
-                if (callback) {
-                    callback({
-                        type: (status != 'error' ? 'success' : 'error'),
-                        data: xData
-                    });
-                }
-            },
-            contentType: "text/xml; charset=\"utf-8\""
-        });
-    };
-    // End Utility Method /removeUserFromGroup/
-
-    // Begin utility method /removeUserFromWeb/
-    removeUserFromWeb = function(url, user, callback) {
-        var results = [],
-            login = user.loginname.replace('/', '\\'),
-            // Create the SOAP request
-            soapEnv =
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\
-                    <soap:Body>\
-                        <RemoveUserFromSite xmlns="http://schemas.microsoft.com/sharepoint/soap/directory/">\
-                            <userLoginName>' + login + '</userLoginName>\
-                        </RemoveUserFromSite>\
-                    </soap:Body>\
-                </soap:Envelope>';
-
-        //data calls assume url ends with '/'
-        //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
-            url = url + '/';
-        }
-
-
-        $.ajax({
-            url: url + "_vti_bin/UserGroup.asmx",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', "http://schemas.microsoft.com/sharepoint/soap/directory/RemoveUserFromSite");
-            },
-            type: "POST",
-            dataType: "xml",
-            data: soapEnv,
-            tryCount: 0,
-            retryLimit: 0,
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                printError(XMLHttpRequest, textStatus, errorThrown)
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    //try again
-                    $.ajax(this);
-                    return;
-                }
-            },
-            complete: function(xData, status) {
-                if (callback) {
-                    callback({
-                        type: (status != 'error' ? 'success' : 'error'),
-                        data: xData
-                    });
-                }
-            },
-            contentType: "text/xml; charset=\"utf-8\""
-        });
-    };
-    // End Utility Method /removeUserFromWeb/
-
-    // Begin utility method /updateGroupInfo/
-    updateGroupInfo = function(url, options, callback) {
-        var results = [],
-            updates = "",
-            soapEnv = "";
-        if (!options) {
-            return false;
-        }
-
-        updates += '<oldGroupName>' + options.oldGroupName + '</oldGroupName>' + '<groupName>' + options.name + '</groupName>' + '<ownerIdentifier>' + options.ownerIdentifier + '</ownerIdentifier>' + '<ownerType>' + options.ownerType + '</ownerType>' + '<description>' + options.description + '</description>';
-
-        // Create the SOAP request
-        soapEnv =
-            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">\
-                    <soap:Body>\
-                        <UpdateGroupInfo xmlns="http://schemas.microsoft.com/sharepoint/soap/directory/">\
-                           ' + updates + '\
-                        </UpdateGroupInfo>\
-                    </soap:Body>\
-                </soap:Envelope>';
-
-        //data calls assume url ends with '/'
-        //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
-            url = url + '/';
-        }
-
-
-        $.ajax({
-            url: url + "_vti_bin/UserGroup.asmx",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader('SOAPAction', "http://schemas.microsoft.com/sharepoint/soap/directory/UpdateGroupInfo");
-            },
-            type: "POST",
-            dataType: "xml",
-            data: soapEnv,
-            tryCount: 0,
-            retryLimit: 0,
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                printError(XMLHttpRequest, textStatus, errorThrown)
-                this.tryCount++;
-                if (this.tryCount <= this.retryLimit) {
-                    //try again
-                    $.ajax(this);
-                    return;
-                }
-            },
-            complete: function(xData, status) {
-                if (callback) {
-                    callback({
-                        type: (status != 'error' ? 'success' : 'error'),
-                        data: xData,
-                        updates: options
-                    });
-                }
-            },
-            contentType: "text/xml; charset=\"utf-8\""
-        });
-    };
-    // End utility method /updateGroupInfo/
-
-    // Begin utility method /getCurrentUser/
-    getCurrentUser = function(url, callback) {
-        var type;
-
-        //data calls assume url ends with '/'
-        //fix url if it dosn't end with '/'
-        if (!app.utility.endsWith(url, '/')) {
-            url = url + '/';
-        }
-
-        // Get the UserDisp.aspx page using AJAX
-        $.ajax({
-            // Force parameter forces redirection to a page that displays the information as stored in the UserInfo table rather than My Site.
-            // Adding the extra Query String parameter with the current date/time forces the server to view this as a new request.
-            url: url + "_layouts/userdisp.aspx?Force=True&" + new Date().getTime(),
-            type: "POST",
-            dataType: "xml",
-            complete: function(xData, status) {
-                type = (status != 'error' ? 'success' : 'error');
-                if (type == 'success') {
-                    _processUserFields(xData, callback);
-                } else if (callback) {
-                    callback({
-                        data: xData,
-                        type: type
-                    });
-                }
             }
         });
     };
-    // End utility method /getCurrentUser/
+    // End Utility Method /_getListItems/
 
-    // Begin utility method /_processUserFields/
-    _processUserFields = function(xData, callback) {
-            var opt = $.extend({}, {
-                    webURL: "", // URL of the target Site Collection. If not specified, the current Web is used.
-                    fieldName: "Name", // Specifies which field to return from the userdisp.aspx page
-                    fieldNames: {},
-                    // Specifies which fields to return from the userdisp.aspx page - added in v0.7.2 to allow multiple columns
-                    debug: false // If true, show error messages; if false, run silent
-                }, {}),
-                thisField = "",
-                theseFields = {},
-                fieldCount = opt.fieldNames.length > 0 ? opt.fieldNames.length : 1;
+    // Begin Utility Method /saveData/
+    saveData = function(dataObjArr, type){
+        var url = dataObjArr.url,
+        data = dataObjArr.data,
+        guid = dataObjArr.guid,
+        callback = dataObjArr.callback,
+        method = dataObjArr.method;
 
-
-            for (i = 0; i < fieldCount; i++) {
-                var thisTextValue;
-                if (fieldCount > 1) {
-                    thisTextValue = RegExp(
-                        "FieldInternalName=\"" + opt.fieldNames[i] + "\"", "gi");
-                } else {
-                    thisTextValue = RegExp(
-                        "FieldInternalName=\"" + opt.fieldName + "\"", "gi");
-                }
-
-                $(xData.responseText).find(
-                    "table.ms-formtable td[id^='SPField']").each(function() {
-                    if (thisTextValue.test($(this).html())) {
-                        // Each fieldtype contains a different data type, as indicated by the id
-                        switch ($(this).attr("id")) {
-                            case "SPFieldText":
-                                thisField = $(
-                                    this).text();
-                                break;
-                            case "SPFieldNote":
-                                thisField = $(
-                                    this).find("div").html();
-                                break;
-                            case "SPFieldURL":
-                                thisField = $(
-                                    this).find("img").attr("src");
-                                break;
-                                // Just in case
-                            default:
-                                thisField = $(
-                                    this).text();
-                                break;
-                        }
-                        // Stop looking; we're done
-                        return false;
+         _buildPayload(data, 0, {}, method, '', function (results) {
+                _saveListItem(url, guid, results, function(results){
+                    if(callback){
+                        callback(results);
                     }
+                    
                 });
-                if (opt.fieldNames[i] !== "ID") {
-                    thisField = (
-                        typeof thisField !== "undefined") ? thisField.replace(/(^[\s\xA0]+|[\s\xA0]+$)/g, '') : null;
-                }
+            });
+    }
+    // End Utility Method /saveData/
 
-                if (fieldCount > 1) {
-                    theseFields[opt.fieldNames[i]] = thisField;
-                }
-            }
+     // Begin Utility Method /_saveListItem/
+    _saveListItem = function (url, guid, payload, callback) {
+        var results = [],
+            
+        // Create the SOAP request
+         soapEnv =
+            '<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">'
+                + '<soap:Body>'
+                    + '<UpdateListItems xmlns="http://schemas.microsoft.com/sharepoint/soap/">'
+                    + '<listName>' + guid + '</listName>'
+                    + '<updates>'
+                        + '<Batch OnError="Continue" PreCalc="True">'
+                            + payload
+                        + '</Batch>'
+                    + '</updates>'
+                    + '</UpdateListItems>'
+                + '</soap:Body>'
+            + '</soap:Envelope>';
 
-            if (callback) {
-                callback({
-                    data: (fieldCount > 1 ? theseFields : thisField),
-                    type: 'success'
-                });
-            }
+        $.ajax({
+            url: url + "/_vti_bin/lists.asmx",
+            beforeSend: function(xhr){
+                xhr.setRequestHeader('SOAPAction', 'http://schemas.microsoft.com/sharepoint/soap/UpdateListItems');
+            },
+            type: "POST",
+            dataType: "xml",
+            data: soapEnv,
+            error: printError,
+            complete:  function(xData, status){
+                var error = $(xData.responseText).find('ErrorText').text(),
+                results = {data: $(xData.responseText).find('z\\:row'), error: error};
+
+                if (callback) {
+                    callback(results);
+                }
+            },
+            contentType: "text/xml; charset=\"utf-8\""
+        });
+    };
+    // End Utility Method /saveListItem/
+
+    // Begin Utility Method /_buildPayload/
+    _buildPayload = function (arr, index, obj_map, method, payload, callback) {
+        var i,
+            method_map = {
+                'new': 'New',
+                'update': 'Update',
+                'delete': 'Delete'
+            },
+            fileName, fieldValue, key, fieldPayload = "";
+
+        payload = payload || "";
+
+        if (!(arr instanceof Array) 
+            || !(obj_map instanceof Object)
+            || !(method_map.hasOwnProperty(method.toLowerCase()))
+            ){
+            return false;
         }
-        // End utility method /_processUserFields/
+
+        method = method_map[method];
+
+        if(index < arr.length){
+            for (key in arr[index]) {
+                fieldName = key;
+                fieldValue = app.browser_util.encodeXml(arr[index][key]);
+                fieldPayload += '<Field Name="' + fieldName + '">' + fieldValue + '</Field>';
+            }
+
+            payload += '<Method ID="' + (index + 1) + '" Cmd="' + method + '">' + (method.toLowerCase() == 'new' ? '<Field Name="ID">New</Field>' : '') + fieldPayload + '</Method>';
+            index++;
+
+            _buildPayload(arr, index, obj_map, method, payload, callback);
+
+        } else if (callback) {
+            callback(payload);
+            return payload;
+        } else {
+            return payload;
+        }
+
+   
+    };
+    // End Utility Method /_buildPayload/
+
+
+    printError = function(XMLHttpRequest, textStatus, errorThrown) {
+        console.log(XMLHttpRequest + '\n\n' + textStatus + '\n\n' + errorThrown);
+    };
+
+    // Begin Utility Method /processData/
+     processData = function(results) {
+        var data = [{}],
+            attrObj = {},
+            i, j, attribute,
+            chart = this.model;
+
+
+        //repackage data into an array which each index
+        //is an object with key value pairs
+        for (i = 0; i < results.length; i++){
+            attrObj = {};
+            if(!results[i].attributes){
+                continue;
+            }
+            for (j = 0; j < results[i].attributes.length; j++){
+                attribute = results[i].attributes[j];
+                attrObj[attribute.name] = attribute.value;
+            }
+            data.push(attrObj);
+        }
+
+        return data;
+    };
+   // End Utility Method /processData/
+
     return {
-        getPermissions: getPermissions,
-        getUsers: getUsers,
-        getUsersFromGroup: getUsersFromGroup,
-        addUserToGroup: addUserToGroup,
-        removeUserFromGroup: removeUserFromGroup,
-        removeUserFromWeb: removeUserFromWeb,
-        modifyPermissions: modifyPermissions,
-        modifyUsers: modifyUsers,
-        updateGroupInfo: updateGroupInfo,
-        getCurrentUser: getCurrentUser
+        getData: getData,
+        saveData: saveData
     };
 })();
+
+String.prototype.endsWith = function(suffix){
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+}
+
+app.browser_util = (function(){
+    var configMap = {
+            regex_encode_html: /[&"'><]/g,
+            regex_encode_noamp: /["'><]/g,
+            html_encode_map: {
+                '&': '&#38;',
+                '"': '&#34;',
+                "'": '&#39;',
+                '>': '&#62;',
+                '<': '&#60;'
+            }
+        },
+        decodeHtml, encodeHtml, encodeXml;
+
+    configMap.encode_noamp_map = $.extend({}, configMap.html_encode_map);
+    // Begin decodeHtml
+    // Decodes HTML entities in a browser-friendly way
+    // See http://stackoverflow.com/questions/1912501/\
+    // unescape-html-entities-in-javascript
+    //
+    decodeHtml = function (str) {
+        return $('<div/>').html(str || '').text();
+    };
+    // End decodeHtml
+
+    // Begin encodeHtml
+    // This is single pass encoder for html entities and handles
+    // an arbitrary number of characters
+    //
+    encodeHtml = function (input_arg_str, exclude_amp) {
+        var
+            input_str = String(input_arg_str),
+            regex, lookup_map
+        ;
+
+        if (exclude_amp) {
+            lookup_map = configMap.encode_noamp_map;
+            regex = configMap.regex_encode_noamp;
+        }
+        else {
+            lookup_map = configMap.html_encode_map;
+            regex = configMap.regex_encode_html;
+        }
+        return input_str.replace(regex,
+                function (match, name) {
+                    return lookup_map[match] || '';
+                }
+            );
+    };
+    // End encodeHtml
+
+    // Begin encodeXml
+    encodeXml = function (string) {
+        if (typeof string !== "string") {
+            return string;
+        }
+        return string.replace(/\&/g, '&' + 'amp;').replace(/</g, '&' + 'lt;').replace(/>/g, '&' + 'gt;').replace(/\'/g, '&' + 'apos;').replace(/\"/g, '&' + 'quot;');
+    };
+    // End encodeXml
+
+    return {
+        encodeXml: encodeXml,
+        encodeHtml: encodeHtml,
+        decodeHtml: decodeHtml
+    }
+})();
+
+ // This method for finding specific nodes in the returned XML was developed by Steve Workman. See his blog post
+    // http://www.steveworkman.com/html5-2/javascript/2011/improving-javascript-xml-node-finding-performance-by-2000/
+    // for performance details.
+    $.fn.filterNode = function (name) {
+        return this.find('*').filter(function () {
+            return this.nodeName === name;
+        });
+    }; // End $.fn.filterNode

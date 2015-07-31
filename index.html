@@ -60,7 +60,9 @@
                     <br>
                     <kbd>Right Click</kbd> node for context menu
                     <br>
-                    Press <kbd>Esc</kbd> on your keyboard to cancel move 
+                    <kbd>Esc</kbd> to cancel move
+                       <br>
+                    <kbd>Ctrl</kbd> + <kbd>E</kbd> to toggle <strong>Edit</strong> mode
                 </p>
             </div>
             <%}%>
@@ -155,7 +157,15 @@
     <!-- Router -->
     <script src="js/routes/routes.js"></script>
     <script>
-    $(document).foundation({});
+    $(document).foundation({})
+        .on('keydown', function(e) {
+         
+            if (e.which === 69 && e.ctrlKey) {
+                   e.preventDefault();
+                toggleEditMode();
+
+            }
+        });
     $('body').on('click', function(e) {
         $('.context').hide();
     }).on('contextmenu', function(e) {
@@ -165,9 +175,16 @@
                 $(this).hide();
             }
         });
-
-     
     });
+
+    function toggleEditMode() {
+        app.config.editing = !app.config.editing;
+        if (window.location.href.indexOf('/edit=true') > -1) {
+            window.location.href = window.location.href.replace('/edit=true', '');
+        } else {
+            window.location.href += '/edit=true';
+        }
+    }
     </script>
 </body>
 
