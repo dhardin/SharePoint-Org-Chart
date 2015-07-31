@@ -40,7 +40,7 @@ app.itemFetchData = function() {
                 app.state_map.fetchingData = false;
                 results = app.processResults(results);
                 //set library to results
-                app.ItemCollection.set(results);
+                app.ItemCollection = new app.Library(results);
                 //app.ItemCollection.trigger('change');
                 if (app.dataLoadCallback) {
                     for (i = 0; i < app.dataLoadCallback.length; i++) {
