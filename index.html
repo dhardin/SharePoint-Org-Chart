@@ -179,10 +179,10 @@
 
     function toggleEditMode() {
         app.config.editing = !app.config.editing;
-        if (window.location.href.indexOf('/edit=true') > -1) {
-            window.location.href = window.location.href.replace('/edit=true', '');
+        if (window.location.hash.indexOf('/edit=true') > -1) {
+            window.location.hash = window.location.hash.replace('/edit=true', '');
         } else {
-            window.location.href += '/edit=true';
+            window.location.hash = '#' + window.location.hash + '/edit=true';
         }
     }
     </script>
