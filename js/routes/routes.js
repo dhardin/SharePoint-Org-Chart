@@ -23,7 +23,7 @@ var Router = Backbone.Router.extend({
         var fetchingDataView;
 
         if(!app.state_map.fetchingData){
-             app.router.navigate('orgchart', true);
+             app.router.navigate('', true);
              return;
         }
 
