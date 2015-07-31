@@ -11,12 +11,19 @@ app.ItemView = Backbone.View.extend({
         'click .delete': 'delete',
         'click .move': 'move',
         'click .edit': 'edit',
+        'click a': 'route',
         contextmenu: 'contextmenu'
     },
 
     initialize: function(options) {
         this.model.on('change', this.render, this);
 
+    },
+
+    route: function(e){
+        if(this.listening){
+            e.preventDefault();
+        }
     },
 
     contextmenu: function(e) {
