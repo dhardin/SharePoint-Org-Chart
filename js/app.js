@@ -31,6 +31,27 @@ app.itemFetchData = function() {
             return (index == 1 ? '<li><a href="#department/'+previous+'">'+previous+'</a></li>' : previous) + '<li><a href="#department/'+current+'">'+current+'</a></li>';
         }));
         app.DataFetched();
+    } else {
+           app.data.getData([{
+            url: app.config.url,
+            type: 'list',
+            guid: app.config.guid,
+            callback: function(results) {
+                app.state_map.fetchingData = false;
+                results = app.processResults(results);
+                //set library to results
+                app.ItemCollection.set(results);
+                //app.ItemCollection.trigger('change');
+                if (app.dataLoadCallback) {
+                    for (i = 0; i < app.dataLoadCallback.length; i++) {
+                        app.dataLoadCallback[i]();
+                    }
+                    app.dataLoadCallback = false;
+                }
+            }
+        }], 0, function() {
+            app.state_map.fetched = true;
+        });
     }
 };
 

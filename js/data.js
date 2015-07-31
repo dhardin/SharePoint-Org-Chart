@@ -10,7 +10,7 @@
 //
 var app = app || {};
 
-app.spData = (function(){
+app.data = (function(){
     var stateMap = {
         dataArr: [],
         currentDataArrIndex: 0
