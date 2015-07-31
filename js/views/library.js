@@ -15,7 +15,8 @@ app.LibraryView = Backbone.View.extend({
         this.parent_cache = {};
         this.parent_id_cache = {};
 
-        this.setParentChildren();
+     //   this.setParentChildren();
+     //   this.setParents();
     },
 
     addModel: function(parent) {
@@ -115,6 +116,9 @@ app.LibraryView = Backbone.View.extend({
                 that.$el.append(that.buildTable(node, opts));
             }
         });
+
+        this.setParentChildren();
+     //   this.setParents();
         return this;
     },
 
@@ -125,6 +129,28 @@ app.LibraryView = Backbone.View.extend({
                 parent: model.get('id')
             }));
         });
+    },
+
+    setParents: function(parent, parentArr) {
+        var children, i, model;
+        parentArr = parentArr || [];
+        if (!parent) {
+            parent = this.collection.where({
+                parent: 0
+            })[0];
+            parent.set({parents: []});
+        }
+        parentArr.push(parent);
+        children = this.collection.where({
+            parent: parent.get('id')
+        });
+        for(i = 0; i < children.length; i++){
+            model = children[i];
+            model.set({
+                parents: parentArr.slice()
+            });
+            this.setParents(model, parentArr);
+       }
     },
 
     buildTable: function(node, opts) {
