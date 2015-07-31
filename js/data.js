@@ -242,7 +242,8 @@ app.data = (function(){
 
     return {
         getData: getData,
-        saveData: saveData
+        saveData: saveData,
+        processData: processData
     };
 })();
 

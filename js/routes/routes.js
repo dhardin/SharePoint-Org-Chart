@@ -20,7 +20,14 @@ var Router = Backbone.Router.extend({
         app.router.AppView.showView(errorView);
     },
     fetch: function() {
-        var fetchingDataView = new app.FetchingDataView();
+        var fetchingDataView;
+
+        if(!app.state_map.fetchingData){
+             app.router.navigate('orgchart', true);
+             return;
+        }
+
+        fetchingDataView = new app.FetchingDataView();
 
         this.AppView.showView(fetchingDataView);
     },
