@@ -55,6 +55,33 @@ app.itemFetchData = function() {
     }
 };
 
+
+app.processResults = function(results) {
+    var temp_results = app.spData.processData(results),
+        index = 0, i = 0;
+
+        results = [];
+
+    for (i = 0; i < temp_results.length; i++) {
+        if (Object.keys(temp_results[i]).length == 0) {
+            continue;
+        }
+
+        results.push({});
+        index = results.length - 1;
+
+        //make all keys lower case
+        for (var key in temp_results[i]) {
+            if (app.property_map.hasOwnProperty(key.toLowerCase())) {
+                value = temp_results[i][key];
+                key = app.property_map[key.toLowerCase()];
+                results[index][key] = value;
+            }
+        }
+    }
+    return results;
+};
+
 $.fn.insertAt = function(index, element) {
     var lastIndex = this.children().size();
 
