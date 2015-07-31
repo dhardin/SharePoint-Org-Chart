@@ -57,7 +57,7 @@ app.itemFetchData = function() {
 
 
 app.processResults = function(results) {
-    var temp_results = app.spData.processData(results),
+    var temp_results = app.data.processData(results),
         index = 0, i = 0;
 
         results = [];
@@ -72,7 +72,7 @@ app.processResults = function(results) {
 
         //make all keys lower case
         for (var key in temp_results[i]) {
-            if (app.property_map.hasOwnProperty(key.toLowerCase())) {
+            if (app.config.property_map.hasOwnProperty(key.toLowerCase())) {
                 value = temp_results[i][key];
                 key = app.property_map[key.toLowerCase()];
                 results[index][key] = value;
