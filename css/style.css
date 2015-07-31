@@ -1,5 +1,5 @@
 body {
-     -webkit-touch-callout: none;
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
@@ -26,7 +26,6 @@ div.orgChart div.node a {
 div.orgChart div.node:hover {
     border: 1px solid #aaa;
 }
-
 
 div.orgChart tr.lines td.left {
     float: none !important;
@@ -61,35 +60,34 @@ div.orgChart tr.lines td.right {
     border-left: 0px solid black;
 }
 
-.context a{
+.context a {
     line-height: normal;
     display: block;
     padding: 0.5em;
 }
 
-.context a:hover{
+.context a:hover {
     background-color: #eee;
 }
 
 .button.close-reveal-modal {
-        font-size:  inherit;
-     line-height:  normal;
-    position:  relative; 
-     top:  inherit;
-    right:  inherit;
-     color:  #fff;
-    font-weight:  normal;
-    cursor:  inherit;
+    font-size: inherit;
+    line-height: normal;
+    position: relative;
+    top: inherit;
+    right: inherit;
+    color: #fff;
+    font-weight: normal;
+    cursor: inherit;
 }
 
-.red{
+.red {
     color: #cf2a0e;
 }
 
 .green {
     color: #43AC6A;
 }
-
 
 .context {
     position: absolute;
@@ -105,40 +103,39 @@ div.orgChart tr.lines td.right {
 }
 
 .draggable {
-      /* IE 8 */
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-
-  /* IE 5-7 */
-  filter: alpha(opacity=80);
-
-  /* Netscape */
-  -moz-opacity: 0.8;
-
-  /* Safari 1.x */
-  -khtml-opacity: 0.8;
-
-  /* Good browsers */
-  opacity: 0.8;
-  position: absolute !important;
-  cursor: -webkit-grabbing;
-  border: 1px solid #e7e7e7;
-  width: auto;
+    /* IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    /* IE 5-7 */
+    filter: alpha(opacity=80);
+    /* Netscape */
+    -moz-opacity: 0.8;
+    /* Safari 1.x */
+    -khtml-opacity: 0.8;
+    /* Good browsers */
+    opacity: 0.8;
+    position: absolute !important;
+    cursor: -webkit-grabbing;
+    border: 1px solid #e7e7e7;
+    width: auto;
     height: auto;
     padding: 1em;
     text-align: center;
 }
 
-
 div.orgChart div.node.listen:hover {
-      box-shadow: 0px 0px 10px green;
-      cursor: cell !important;
+    box-shadow: 0px 0px 10px green;
 }
 
-div.orgChart div.node.moving:hover, div.orgChart div.node.child:hover {
-      box-shadow: 0px 0px 10px red;
-      cursor: not-allowed;
+div.orgChart div.node.listen:hover,
+div.orgChart div.node.listen a:hover {
+    cursor: cell !important;
 }
 
+div.orgChart div.node.moving:hover,
+div.orgChart div.node.child:hover {
+    box-shadow: 0px 0px 10px red;
+    cursor: not-allowed;
+}
 
 .instructions {
     position: fixed;
