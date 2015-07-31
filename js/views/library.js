@@ -27,17 +27,23 @@ app.LibraryView = Backbone.View.extend({
         };
         model = this.collection.add(model);
         model.set('id', model.get('id').length > 0 ? model.get('id') : model.cid);
-        parent.set({children: parent.get('children').concat(model) });
+        parent.set({
+            children: parent.get('children').concat(model)
+        });
         this.showModal(model);
 
 
     },
 
     deleteModel: function(model) {
-        var parent = this.collection.get({id: model.get('parent')});
-         parent.set({children: _.reject(parent.get('children'), function(child){
-            return child === model;
-         })});
+        var parent = this.collection.get({
+            id: model.get('parent')
+        });
+        parent.set({
+            children: _.reject(parent.get('children'), function(child) {
+                return child === model;
+            })
+        });
         this.collection.remove(model);
 
     },
@@ -322,7 +328,6 @@ app.LibraryView = Backbone.View.extend({
         var detailsView = new app.DetailsView({
             model: model
         });
-
 
         this.$modal.find('.content').html(detailsView.render().el);
         this.$modal.foundation('reveal', 'open');

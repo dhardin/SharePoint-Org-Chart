@@ -42,8 +42,9 @@ app.ItemView = Backbone.View.extend({
     },
 
     select: function(e) {
+        e.preventDefault();
         if (!e || $(e.target).parent('.context').length == 0) {
-            if (!this.listening || (e && e.target.className !== 'subheader' && $(e.target).parent('.subheader').length == 0)) {
+            if (!this.listening) {
                 this.closeContext();
                 Backbone.pubSub.trigger('showModal', this.model);
             } else {
