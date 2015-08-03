@@ -7,6 +7,7 @@ app.Item = Backbone.Model.extend({
         lastName: '',
         email: '',
         id: '',
+        title: '',
         parent: '',
         phone: '',
         department: '',

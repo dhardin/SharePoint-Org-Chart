@@ -2,22 +2,18 @@ var app = app || {};
 
 
 app.config = {
-	url: 'url to your SharePoint site goes here...',
-	guid: 'guid to your SharePoint list',
+	url: '',
+	guid: '',
 	tryCount: 3,
 	testing: true,
 	editing: false,
 	property_map: {
-		item: {
+			ows_title: 'lastName',
 			ows_name: 'name',
-	    	ows_department: 'department',
+	    	ows_unit: 'department',
 	    	ows_supervisor: 'parent',
-	    	ows_phone: 'phone',
+	    	ows_workphone: 'phone',
 	    	ows_email: 'email',
-	    	ows_position: 'subtitle'
-    	}
-	},
-	settings_map:{
-		default_department: 'some department'
+	    	ows_jobtitle: 'title'
 	}
 };

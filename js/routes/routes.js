@@ -40,7 +40,9 @@ var Router = Backbone.Router.extend({
 
         if (app.state_map.fetchingData) {
             app.router.navigate('fetch', true);
-            app.state_map.dataLoadCallback = function() {};
+            app.state_map.dataLoadCallback = function() {
+                   app.router.navigate('', true);
+            };
             return;
         } else {
             library = new app.Library();

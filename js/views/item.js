@@ -54,8 +54,8 @@ app.ItemView = Backbone.View.extend({
     },
 
     select: function(e) {
-        //  e.preventDefault();
-        if (!e || $(e.target).parent('.context').length == 0) {
+         e.stopPropagation();
+        if (!e || $(e.target).parent('.context').length == 0 && e.target.nodeName != 'A') {
             if (!this.listening && !this.dragging) {
                 this.closeContext();
                 Backbone.pubSub.trigger('showModal', this.model);

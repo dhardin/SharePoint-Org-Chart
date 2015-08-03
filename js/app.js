@@ -9,8 +9,14 @@ app.state_map = {
     }
 };
 
-app.DataFetched = function() {
+app.DataFetched = function(data) {
     app.state_map.fetchingData = false;
+    app.state_map.fetched.items = true;
+      var departments = _.unique(_.pluck(data, 'department'));
+
+        $('.departments').append(departments.reduce(function(previous, current, index, array) {
+            return (index == 1 ? '<li><a href="#department/' + previous + '">' + previous + '</a></li>' : previous) + '<li><a href="#department/' + current + '">' + current + '</a></li>';
+        }));
     if (app.state_map.dataLoadCallback) {
         app.state_map.dataLoadCallback();
     }
@@ -25,14 +31,9 @@ app.itemFetchData = function() {
         app.ItemCollection = new app.Library(data);
         app.state_map.fetched.items = true;
         //setup navigation items
-        var departments = _.unique(_.pluck(data, 'department'));
-
-        $('.departments').append(departments.reduce(function(previous, current, index, array) {
-            return (index == 1 ? '<li><a href="#department/'+previous+'">'+previous+'</a></li>' : previous) + '<li><a href="#department/'+current+'">'+current+'</a></li>';
-        }));
-        app.DataFetched();
+        app.DataFetched(data);
     } else {
-           app.data.getData([{
+        app.data.getData([{
             url: app.config.url,
             type: 'list',
             guid: app.config.guid,
@@ -42,25 +43,19 @@ app.itemFetchData = function() {
                 //set library to results
                 app.ItemCollection = new app.Library(results);
                 //app.ItemCollection.trigger('change');
-                if (app.dataLoadCallback) {
-                    for (i = 0; i < app.dataLoadCallback.length; i++) {
-                        app.dataLoadCallback[i]();
-                    }
-                    app.dataLoadCallback = false;
-                }
+                app.DataFetched(results);
             }
-        }], 0, function() {
-            app.state_map.fetched = true;
-        });
+        }],0);
     }
 };
 
 
 app.processResults = function(results) {
     var temp_results = app.data.processData(results),
-        index = 0, i = 0;
+        index = 0,
+        i = 0;
 
-        results = [];
+    results = [];
 
     for (i = 0; i < temp_results.length; i++) {
         if (Object.keys(temp_results[i]).length == 0) {
@@ -74,7 +69,7 @@ app.processResults = function(results) {
         for (var key in temp_results[i]) {
             if (app.config.property_map.hasOwnProperty(key.toLowerCase())) {
                 value = temp_results[i][key];
-                key = app.property_map[key.toLowerCase()];
+                key = app.config.property_map[key.toLowerCase()];
                 results[index][key] = value;
             }
         }
