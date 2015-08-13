@@ -27,6 +27,15 @@ data = [
 	phone: '555-555-5555'
 
 },{
+	name: 'Dan',
+	department: 'Plumbing',
+	parent: 2,
+	title: 'Assistant Plumber',
+	id: 444,
+	email: 'Dan@pluming.net',
+	phone: '555-555-5555'
+
+},{
 	name: 'Chaz',
 	department: 'Plumbing',
 	parent: 2,

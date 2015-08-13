@@ -35,22 +35,28 @@ app.itemFetchData = function() {
     } else {
         app.data.getData([{
             url: app.config.url,
-            type: 'list',
-            guid: app.config.guid,
-            callback: function(results) {
-                app.state_map.fetchingData = false;
-                results = app.processResults(results);
-                //set library to results
-                app.ItemCollection = new app.Library(results);
-                //app.ItemCollection.trigger('change');
-                app.DataFetched(results);
-            }
+                type: 'list',
+                guid: app.config.guid,
+                callback: function(results) {
+                    app.state_map.fetchingData = false;
+                    results = app.processResults(results, function(key, value) {
+                        if (key == 'name' || key == 'parent') {
+                            return value.split('#')[1];
+                        } else {
+                            return value;
+                        }
+                    });
+                    //set library to results
+                    app.ItemCollection = new app.Library(results);
+                    //app.ItemCollection.trigger('change');
+                    app.DataFetched(results);
+                }
         }],0);
     }
 };
 
 
-app.processResults = function(results) {
+app.processResults = function(results, format_func) {
     var temp_results = app.data.processData(results),
         index = 0,
         i = 0;
@@ -71,6 +77,9 @@ app.processResults = function(results) {
                 value = temp_results[i][key];
                 key = app.config.property_map[key.toLowerCase()];
                 results[index][key] = value;
+                if(format_func){
+                    results[index][key] = format_func(key, value);
+                }
             }
         }
     }

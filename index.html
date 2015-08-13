@@ -16,6 +16,28 @@
     <script type="text/javascript" src="lib/backbone.js"></script>
     <script type="text/javascript" src="lib/foundation/js/foundation.min.js"></script>
     <script type="text/javascript" src="lib/foundation/js/vendor/modernizr.js"></script>
+    <script type="text/javascript" src="lib/d3.js"></script>
+    <style>
+    .node {
+        cursor: pointer;
+    }
+    
+    .node circle {
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 3px;
+    }
+    
+    .node text {
+        font: 1em sans-serif;
+    }
+    
+    .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 2px;
+    }
+    </style>
 </head>
 
 <body>
@@ -60,8 +82,9 @@
                     <kbd>Right Click</kbd> node for context menu
                     <br>
                     <kbd>Esc</kbd> to cancel move
-                       <br>
-                    <kbd>Ctrl</kbd> + <kbd>E</kbd> to toggle <strong>Edit</strong> mode
+                    <br>
+                    <kbd>Ctrl</kbd> +
+                    <kbd>E</kbd> to toggle <strong>Edit</strong> mode
                 </p>
             </div>
             <%}%>
@@ -80,6 +103,21 @@
                 </div>
                 <%}%>
         </div>
+    </script>
+    <script type="text/template" id="item-collection-template">
+    </script>
+    <script type="text/template" id="item-list-template">
+        <a>
+            <%=name%>
+        </a>
+        <% if(app.config.editing){%>
+            <div class="context vcard">
+                <a class="add">Add</a>
+                <a class="edit">Edit</a>
+                <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
+                <a class="delete">Delete</a>
+            </div>
+            <%}%>
     </script>
     <script type="text/template" id="details-item-template">
         <form>
@@ -142,8 +180,11 @@
     <script src="js/models/library.js"></script>
     <!-- Views -->
     <script src="js/views/item.js"></script>
+    <script src="js/views/list-item.js"></script>
     <script src="js/views/details.js"></script>
     <script src="js/views/library.js"></script>
+    <script src="js/views/libraryD3.js"></script>
+    <script src="js/views/library-item.js"></script>
     <script src="js/views/fetchingData.js"></script>
     <script src="js/views/error.js"></script>
     <script src="js/views/app.js"></script>
@@ -158,9 +199,9 @@
     <script>
     $(document).foundation({})
         .on('keydown', function(e) {
-         
+
             if (e.which === 69 && e.ctrlKey) {
-                   e.preventDefault();
+                e.preventDefault();
                 toggleEditMode();
 
             }

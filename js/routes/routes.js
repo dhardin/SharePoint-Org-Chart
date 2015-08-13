@@ -2,7 +2,8 @@ var app = app || {};
 
 var Router = Backbone.Router.extend({
     routes: {
-          '': 'orgchart',
+        '': 'orgchart',
+        'D3': 'orgchartD3',
         'edit=:edit': 'orgchart',
         'department/:department': 'orgchart',
         'department/:department/edit=:edit': 'orgchart',
@@ -22,9 +23,9 @@ var Router = Backbone.Router.extend({
     fetch: function() {
         var fetchingDataView;
 
-        if(!app.state_map.fetchingData){
-             app.router.navigate('', true);
-             return;
+        if (!app.state_map.fetchingData) {
+            app.router.navigate('', true);
+            return;
         }
 
         fetchingDataView = new app.FetchingDataView();
@@ -41,15 +42,15 @@ var Router = Backbone.Router.extend({
         if (app.state_map.fetchingData) {
             app.router.navigate('fetch', true);
             app.state_map.dataLoadCallback = function() {
-                   app.router.navigate('', true);
+                app.router.navigate('', true);
             };
             return;
         } else {
             library = new app.Library();
         }
 
-        if(department === 'true' || department === 'false'){
-             edit = department;
+        if (department === 'true' || department === 'false') {
+            edit = department;
             department = '';
 
         }
@@ -60,12 +61,32 @@ var Router = Backbone.Router.extend({
 
 
         if (edit) {
-            app.config.editing =  edit === 'true';
+            app.config.editing = edit === 'true';
         } else {
-            if(app.config.editing){
+            if (app.config.editing) {
                 window.location.href = window.location.href + '/edit=true';
             }
         }
+        this.AppView.showView(libraryView);
+    },
+
+    orgchartD3: function() {
+        var fetchingDataView, libraryView;
+        if (!app.state_map.fetched.items) {
+            app.itemFetchData();
+        }
+
+        if (app.state_map.fetchingData) {
+            app.router.navigate('fetch', true);
+            app.state_map.dataLoadCallback = function() {
+                app.router.navigate('D3', true);
+            };
+            return;
+        } else {
+            library = new app.Library();
+        }
+
+        libraryView = new app.LibraryViewD3();
         this.AppView.showView(libraryView);
     },
     // and the function that parses the query string can be something like : 
