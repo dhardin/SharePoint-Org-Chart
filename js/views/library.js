@@ -179,11 +179,12 @@ app.LibraryView = Backbone.View.extend({
     buildCondensedTable: function(model, collection) {
         var children = model.get('children'),
             parent = model.get('parent'),
+            childrenWithChildren = this.getChildrenWithChildren(model, children),
             that = this,
             nodeColSpan, downLineTable, linesCols, i, $tr, $td,
             $table = $('<table cellpadding="0" cellspacing="0" border="0">');
 
-        nodeColspan = children.length > 0 ? 2 * (this.getChildrenWithChildren(model, children).length + (this.getChildrenWithChildren(model, children).length < children.length ? 1 : 0)) : 2;
+        nodeColspan = children.length > 0 ? 2 * (childrenWithChildren.length + (childrenWithChildren.length < children.length ? 1 : 0)) : 2;
         //create new row to add node too
         $tr = $('<tr>');
         //add td with span to row to store node
@@ -215,7 +216,7 @@ app.LibraryView = Backbone.View.extend({
 
         $table.append($tr);
         if (children.length > 0 && collection.length > 1) {
-            $table.append(this.buildBranches(this.getChildrenWithChildren(model, children).length + (this.getChildrenWithChildren(model, children).length < children.length ? 1 : 0)));
+            $table.append(this.buildBranches(childrenWithChildren.length + (childrenWithChildren.length < children.length ? 1 : 0)));
             $tr = $("<tr>");
             for (i in children) {
                 var child = children[i];
