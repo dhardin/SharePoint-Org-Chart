@@ -143,3 +143,11 @@ div.orgChart div.node.child:hover{
     left: 1em;
     display: none;
 }
+
+.node.child-collection .child {
+    position: relative;
+}
+
+.node.child-collection .child .context {
+    position: absolute;
+}

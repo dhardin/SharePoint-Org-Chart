@@ -2,6 +2,7 @@ var app = app || {};
 
 app.ListItemView = Backbone.View.extend({
     template: _.template($('#item-list-template').html()),
+    className: 'child',
 
     events: {
         'change': 'render',
