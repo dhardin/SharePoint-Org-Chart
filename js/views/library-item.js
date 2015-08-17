@@ -8,7 +8,7 @@ app.LibraryChildren = Backbone.View.extend({
         this.collection.on('add reset remove', function() {
             this.render(this.collection);
         }, this);
-        
+
         Backbone.pubSub.on('add', this.addModel, this);
         Backbone.pubSub.on('delete', this.deleteModel, this);
         Backbone.pubSub.on('done', this.render, this);
@@ -18,9 +18,10 @@ app.LibraryChildren = Backbone.View.extend({
         model = this.collection.add(model);
     },
 
-    deleteModel: function(model) {
-        this.collection.remove(model);
-    },
+   
+            deleteModel: function(model) {
+                this.collection.remove(model);
+            },
 
     render: function(collection) {
         var that = this;
@@ -31,8 +32,8 @@ app.LibraryChildren = Backbone.View.extend({
         collection = collection || this.collection;
 
 
-        collection.each(function(model){
-        	that.$el.append(that.renderItem(model));
+        collection.each(function(model) {
+            that.$el.append(that.renderItem(model));
         });
 
         return this;

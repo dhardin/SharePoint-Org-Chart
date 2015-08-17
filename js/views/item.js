@@ -44,7 +44,7 @@ app.ItemView = Backbone.View.extend({
         if (this.dragging) {
             if (this.model.get('parent') != 0) {
                 this.setChildrensParent(this.model.get('parent'));
-                this.model.set('parent', model.get('id'));
+                this.model.set('parent', model.get(app.config.parent_id_field));
             }
             Backbone.pubSub.trigger('done');
         }
@@ -55,7 +55,7 @@ app.ItemView = Backbone.View.extend({
         }
     },
     setChildrensParent: function(parent) {
-        Backbone.pubSub.trigger('setParent', this.model.get('id'), parent);
+        Backbone.pubSub.trigger('setParent', this.model.get(app.config.parent_id_field), parent);
     },
 
     select: function(e) {

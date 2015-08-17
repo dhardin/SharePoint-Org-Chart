@@ -141,4 +141,5 @@ div.orgChart div.node.child:hover{
     position: fixed;
     top: 4em;
     left: 1em;
+    display: none;
 }

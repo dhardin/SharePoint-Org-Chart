@@ -72,36 +72,32 @@
             <div class="content"></div>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
-        <% if(app.config.editing){%>
-            <div class="instructions">
-                <p>
-                    <kbd>Left Click</kbd> node to edit
-                    <br>
-                    <kbd>Left Click</kbd> node <strong>Department</strong> to apply filter
-                    <br>
-                    <kbd>Right Click</kbd> node for context menu
-                    <br>
-                    <kbd>Esc</kbd> to cancel move
-                    <br>
-                    <kbd>Ctrl</kbd> +
-                    <kbd>E</kbd> to toggle <strong>Edit</strong> mode
-                </p>
-            </div>
-            <%}%>
+        <div class="instructions">
+            <p>
+                <kbd>Left Click</kbd> node to edit
+                <br>
+                <kbd>Left Click</kbd> node <strong>Department</strong> to apply filter
+                <br>
+                <kbd>Right Click</kbd> node for context menu
+                <br>
+                <kbd>Esc</kbd> to cancel move
+                <br>
+                <kbd>Ctrl</kbd> +
+                <kbd>E</kbd> to toggle <strong>Edit</strong> mode
+            </p>
+        </div>
     </script>
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
             <h5><%=name%></h5>
             <h5 class="subheader"><a href="#department/<%=department%>"><%=department%></a></h5>
             <h6 class="subheader"><%=title%></h6>
-            <% if(app.config.editing){%>
-                <div class="context vcard">
-                    <a class="add">Add</a>
-                    <a class="edit">Edit</a>
-                    <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
-                    <a class="<%=(children.length > 0 ? 'disabled' : 'delete')%>">Delete</a>
-                </div>
-                <%}%>
+            <div class="context vcard">
+                <a class="add">Add</a>
+                <a class="edit">Edit</a>
+                <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
+                <a class="<%=(children.length > 0 ? 'disabled' : 'delete')%>">Delete</a>
+            </div>
         </div>
     </script>
     <script type="text/template" id="item-collection-template">
@@ -110,14 +106,12 @@
         <a>
             <%=name%>
         </a>
-        <% if(app.config.editing){%>
             <div class="context vcard">
                 <a class="add">Add</a>
                 <a class="edit">Edit</a>
                 <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
                 <a class="delete">Delete</a>
             </div>
-            <%}%>
     </script>
     <script type="text/template" id="details-item-template">
         <form>
@@ -219,10 +213,10 @@
 
     function toggleEditMode() {
         app.config.editing = !app.config.editing;
-        if (window.location.hash.indexOf('/edit=true') > -1) {
-            window.location.hash = window.location.hash.replace('/edit=true', '');
+        if(app.config.editing){
+            $('.instructions').show();
         } else {
-            window.location.hash = '#' + window.location.hash + '/edit=true';
+            $('.instructions').hide();
         }
     }
     </script>

@@ -33,8 +33,8 @@ var Router = Backbone.Router.extend({
         this.AppView.showView(fetchingDataView);
     },
 
-    orgchart: function(department, edit) {
-        var fetchingDataView, libraryView, isEdit = edit || false;
+    orgchart: function(department) {
+        var fetchingDataView, libraryView;
         if (!app.state_map.fetched.items) {
             app.itemFetchData();
         }
@@ -49,24 +49,11 @@ var Router = Backbone.Router.extend({
             library = new app.Library();
         }
 
-        if (department === 'true' || department === 'false') {
-            edit = department;
-            department = '';
-
-        }
-
         libraryView = new app.LibraryView({
             department: department
         });
 
 
-        if (edit) {
-            app.config.editing = edit === 'true';
-        } else {
-            if (app.config.editing) {
-                window.location.href = window.location.href + '/edit=true';
-            }
-        }
         this.AppView.showView(libraryView);
     },
 
