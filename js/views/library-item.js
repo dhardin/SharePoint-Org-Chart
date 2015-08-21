@@ -42,7 +42,7 @@ app.LibraryChildren = Backbone.View.extend({
         }
 
         this.parent.set({
-            children: parent.get('children').concat(item)
+            children: this.parent.get('children').concat(item)
         });
 
         this.render();

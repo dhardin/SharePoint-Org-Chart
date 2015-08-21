@@ -27,19 +27,19 @@ app.LibraryView = Backbone.View.extend({
             item;
         item = new app.Item(model);
         item.set('id', item.get('cid'));
-        
+
         //this.collection.add(item);
         this.showModal(item);
-        
+
     },
- saveModel: function(model) {
+    saveModel: function(model) {
         var parent, that = this;
-          parent=  this.collection.filter(function(mdl) {
-                return mdl.get(that.id_field) == model.get('parent')
-            })[0];
-          if(!parent || parent.get('children').length > 0){
+        parent = this.collection.filter(function(mdl) {
+            return mdl.get(that.id_field) == model.get('parent')
+        })[0];
+        if (!parent || parent.get('children').length > 0) {
             return;
-          }
+        }
         if (!this.collection.get(model)) {
             this.collection.add(model);
         }
@@ -47,7 +47,7 @@ app.LibraryView = Backbone.View.extend({
         parent.set({
             children: parent.get('children').concat(model)
         });
-        if(parent.get('children').length == 1){
+        if (parent.get('children').length == 1) {
             this.render();
         }
     },
@@ -121,10 +121,14 @@ app.LibraryView = Backbone.View.extend({
             key = that.id_field,
             parent;
         if (collection) {
-            parent = collection.at(0).get('parent');
-            return collection.filter(function(model) {
-                return model.get(key) == parent
-            })[0];
+            if (collection.length > 1) {
+                parent = collection.at(0).get('parent');
+                return collection.filter(function(model) {
+                    return model.get(key) == parent
+                })[0];
+            } else {
+                return collection.at(0);
+            }
         } else {
             return this.collection.findWhere({
                 parent: ''
@@ -233,19 +237,19 @@ app.LibraryView = Backbone.View.extend({
                     $tr.append($td);
                 }
             }
-        
-        if (childrenWitoutChildren.length > 0) {
+
+            if (childrenWitoutChildren.length > 0) {
 
 
-            $td = $('<td colspan="2">');
-            that.buildChildCollectionNode($td, childrenWitoutChildren, model);
-            $tr.append($td);
+                $td = $('<td colspan="2">');
+                that.buildChildCollectionNode($td, childrenWitoutChildren, model);
+                $tr.append($td);
 
+
+            }
+            $table.append($tr);
 
         }
-        $table.append($tr);
-
-}
 
         return $table;
     },

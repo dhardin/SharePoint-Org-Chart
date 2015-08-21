@@ -20,7 +20,7 @@ app.ListItemView = Backbone.View.extend({
         Backbone.pubSub.on('select', this.selectParent, this);
         Backbone.pubSub.on('move', this.listen, this);
         Backbone.pubSub.on('done', this.doneMoving, this);
-        this.delete = false;
+        this.pendingDelete = false;
     },
 
     route: function(e) {
@@ -61,7 +61,7 @@ app.ListItemView = Backbone.View.extend({
     },
 
     select: function(e) {
-        if(this.delete){
+        if(this.pendingDelete){
             return;
         }
         if (!e || $(e.target).parent('.context').length == 0) {
@@ -95,7 +95,7 @@ app.ListItemView = Backbone.View.extend({
         if (e.target.className.indexOf('disabled') > -1) {
             return;
         }
-        this.delete = true;
+        this.pendingDelete = true;
         Backbone.pubSub.trigger('delete', this.model);
         this.closeContext();
     },
