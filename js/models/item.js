@@ -2,15 +2,15 @@ var app = app || {};
 
 app.Item = Backbone.Model.extend({
     defaults: {
-        name: '',
-        firstName: '',
-        lastName: '',
-        email: '',
-        id: '',
-        title: '',
+        name: 'N/A',
+        firstName: 'N/A',
+        lastName: 'N/A',
+        email: 'N/A',
+        id: 'N/A',
+        title: 'N/A',
         parent: '',
-        phone: '',
-        department: '',
+        phone: 'N/A',
+        department: 'N/A',
         children: []
     },
     initialize: function(){

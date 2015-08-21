@@ -17,11 +17,12 @@ app.ItemView = Backbone.View.extend({
 
     initialize: function(options) {
         this.model.on('change', this.render, this);
-                Backbone.pubSub.on('context', this.showContext, this);
+        Backbone.pubSub.on('context', this.showContext, this);
         Backbone.pubSub.on('select', this.selectParent, this);
         Backbone.pubSub.on('move', this.listen, this);
         Backbone.pubSub.on('done', this.doneMoving, this);
         Backbone.pubSub.on('setParent', this.setParent, this);
+        this.delete = false;
     },
 
     route: function(e) {
@@ -31,19 +32,26 @@ app.ItemView = Backbone.View.extend({
     },
 
     contextmenu: function(e) {
-        var posX = this.$el.offset().left,
-            posY = this.$el.offset().top;
+        var posX,
+            posY;
+
+        if (!app.config.editing) {
+            return;
+        }
+        posX = this.$el.offset().left;
+        posY = this.$el.offset().top;
         e.preventDefault();
         this.$context.show().css({
             left: e.offsetX,
             top: e.offsetY
         });
+        Backbone.pubSub.trigger('context', this);
+        app.state_map.itemViewContext = this;
     },
 
     selectParent: function(model) {
         if (this.dragging) {
             if (this.model.get('parent') != 0) {
-                this.setChildrensParent(this.model.get('parent'));
                 this.model.set('parent', model.get(app.config.parent_id_field));
             }
             Backbone.pubSub.trigger('done');
@@ -54,19 +62,17 @@ app.ItemView = Backbone.View.extend({
             this.model.set('parent', newParent);
         }
     },
-    setChildrensParent: function(parent) {
-        Backbone.pubSub.trigger('setParent', this.model.get(app.config.parent_id_field), parent);
-    },
-
     select: function(e) {
-         e.stopPropagation();
+        if(this.delete){
+            return;
+        }
         if (!e || $(e.target).parent('.context').length == 0 && e.target.nodeName != 'A') {
             if (!this.listening && !this.dragging) {
                 this.closeContext();
                 Backbone.pubSub.trigger('showModal', this.model);
-            } else if(this.dragging){
+            } else if (this.dragging) {
                 Backbone.pubSub.trigger('done');
-            }else {
+            } else {
                 Backbone.pubSub.trigger('select', this.model);
             }
         }
@@ -75,7 +81,6 @@ app.ItemView = Backbone.View.extend({
 
     closeContext: function(e) {
         this.$context.hide();
-        $('.context-bg').remove();
     },
     edit: function(e) {
         this.select();
@@ -83,6 +88,7 @@ app.ItemView = Backbone.View.extend({
     },
 
     add: function(e) {
+
         Backbone.pubSub.trigger('add', this.model);
         this.closeContext();
     },
@@ -92,26 +98,23 @@ app.ItemView = Backbone.View.extend({
         if (e.target.className.indexOf('disabled') > -1) {
             return;
         }
+        this.delete = true;
         Backbone.pubSub.trigger('delete', this.model);
         this.closeContext();
     },
 
     listen: function(model) {
         if (model != this.model) {
-            //if (this.childOf(model)) {
-            //      this.$node.addClass('child');
-            //  } else {
             this.listening = true;
             this.$node.addClass('listen');
-            // }
         } else {
             this.$node.addClass('moving');
         }
     },
 
-    onClose: function(){
-         this.model.off('change');
-                 Backbone.pubSub.on('context');
+    onClose: function() {
+        this.model.off('change');
+        Backbone.pubSub.on('context');
         Backbone.pubSub.off('select');
         Backbone.pubSub.off('move');
         Backbone.pubSub.off('done');
@@ -167,7 +170,7 @@ app.ItemView = Backbone.View.extend({
         $('body').off('mousemove').css({
             'cursor': 'auto'
         });
-         $(document).off('keyup');
+        $(document).off('keyup');
     },
 
     render: function() {

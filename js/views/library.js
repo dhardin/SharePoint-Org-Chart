@@ -4,7 +4,7 @@ app.LibraryView = Backbone.View.extend({
     template: _.template($('#org-chart-template').html()),
     initialize: function(options) {
         this.collection = app.ItemCollection;
-        this.collection.on('add reset remove', function() {
+        this.collection.on('reset remove', function() {
             this.render(this.collection);
         }, this);
         this.department = options.department;
@@ -13,6 +13,7 @@ app.LibraryView = Backbone.View.extend({
         Backbone.pubSub.on('showModal', this.showModal, this);
         Backbone.pubSub.on('add', this.addModel, this);
         Backbone.pubSub.on('delete', this.deleteModel, this);
+        Backbone.pubSub.on('save', this.saveModel, this);
         Backbone.pubSub.on('done', this.render, this);
         this.parent_cache = {};
         this.parent_id_cache = {};
@@ -20,16 +21,35 @@ app.LibraryView = Backbone.View.extend({
 
     addModel: function(parent) {
         var model = {
-            name: '',
-            parent: parent.get(this.id_field),
-            department: parent.get('department'),
-            title: ''
-        };
-        model = this.collection.add(model);
+                parent: parent.get(this.id_field),
+                department: parent.get('department')
+            },
+            item;
+        item = new app.Item(model);
+        item.set('id', item.get('cid'));
+        
+        //this.collection.add(item);
+        this.showModal(item);
+        
+    },
+ saveModel: function(model) {
+        var parent, that = this;
+          parent=  this.collection.filter(function(mdl) {
+                return mdl.get(that.id_field) == model.get('parent')
+            })[0];
+          if(!parent || parent.get('children').length > 0){
+            return;
+          }
+        if (!this.collection.get(model)) {
+            this.collection.add(model);
+        }
+
         parent.set({
             children: parent.get('children').concat(model)
         });
-        this.showModal(model);
+        if(parent.get('children').length == 1){
+            this.render();
+        }
     },
 
     deleteModel: function(model) {
@@ -62,7 +82,7 @@ app.LibraryView = Backbone.View.extend({
 
     render: function(collection) {
         var modelAttributArr, that = this,
-            parent;
+            parent, instructionsView;
 
         this.childViews = [];
 
@@ -87,6 +107,10 @@ app.LibraryView = Backbone.View.extend({
         this.setParentChildren();
 
         this.$el.append(this.buildCondensedTable(parent, collection));
+        instructionsView = new app.InstructionsView();
+
+        this.$el.append(instructionsView.render().el);
+        this.childViews.push(instructionsView);
 
 
         return this;
@@ -178,6 +202,7 @@ app.LibraryView = Backbone.View.extend({
 
     buildCondensedTable: function(model, collection) {
         var children = model.get('children'),
+            childrenWitoutChildren = new app.Library(this.getChildrenWithoutChildren(model, children)),
             parent = model.get('parent'),
             childrenWithChildren = this.getChildrenWithChildren(model, children),
             that = this,
@@ -190,51 +215,47 @@ app.LibraryView = Backbone.View.extend({
         //add td with span to row to store node
         $td = $("<td colspan='" + nodeColspan + "'>");
         $tr.append($td);
-        if (children.length == 0) {
-            if (!this.parent_child_collection_cache[parent]) {
-                //create new node item collection
-                childrenCollection = new app.Library();
-                //add model to node item collection
-                this.parent_child_collection_cache[parent] = childrenCollection;
-                childrenCollection.add(model);
-                //draw node item collection
-                var childCollectionView = new app.LibraryChildren({
-                    collection: childrenCollection
-                });
-                this.childViews.push(childCollectionView);
-                $td.append(childCollectionView.render().el);
-
-            } else {
-                //add model to collection
-                this.parent_child_collection_cache[parent].add(model);
-                return false;
-            }
-        } else {
-            //draw parent node (has children)
-            $td.append(this.renderItem(model.get(this.id_field)));
-        }
-
+        //draw parent node (has children)
+        $td.append(this.renderItem(model.get(this.id_field)));
+        //build child collection node if children with no children
         $table.append($tr);
-        if (children.length > 0 && collection.length > 1) {
+        if (childrenWithChildren.length > 0 || childrenWitoutChildren.length > 0) {
             $table.append(this.buildBranches(childrenWithChildren.length + (childrenWithChildren.length < children.length ? 1 : 0)));
             $tr = $("<tr>");
-            for (i in children) {
-                var child = children[i];
+            for (i in childrenWithChildren) {
+                var child = childrenWithChildren[i];
                 if (collection.indexOf(child) == -1) {
                     continue;
                 }
-                if (!this.parent_child_collection_cache[parent])
-                    $td = $('<td colspan="2">');
+                $td = $('<td colspan="2">');
                 $td.append(this.buildCondensedTable(child, collection));
                 if ($td.contents().length > 0) {
                     $tr.append($td);
                 }
-
             }
+        
+        if (childrenWitoutChildren.length > 0) {
 
-            $table.append($tr);
+
+            $td = $('<td colspan="2">');
+            that.buildChildCollectionNode($td, childrenWitoutChildren, model);
+            $tr.append($td);
+
+
         }
+        $table.append($tr);
+
+}
+
         return $table;
+    },
+    buildChildCollectionNode: function($target, collection, model) {
+        var childCollectionView = new app.LibraryChildren({
+            collection: collection,
+            parent: model
+        });
+        this.childViews.push(childCollectionView);
+        $target.append(childCollectionView.render().el);
     },
     buildBranches: function(numChildren) {
         var downLineTable = "<table cellpadding='0' cellspacing='0' border='0'><tr class='lines x'><td class='line left half'></td><td class='line right half'></td></table>",
@@ -265,6 +286,13 @@ app.LibraryView = Backbone.View.extend({
 
         return collection.filter(function(model) {
             return model.get('children').length;
+        });
+    },
+    getChildrenWithoutChildren: function(model, collection) {
+        collection = collection || this.collection;
+
+        return collection.filter(function(model) {
+            return model.get('children').length == 0 ? true : false;
         });
     },
     renderItem: function(id) {
@@ -408,10 +436,10 @@ app.LibraryView = Backbone.View.extend({
     },
 
     showModal: function(model) {
-        model = this.collection.get(model);
-        if (!model || this.$modal.is(':visible')) {
-            return;
-        }
+        //  model = this.collection.get(model);
+        //if (!model || this.$modal.is(':visible')) {
+        //     return;
+        //    }
         var detailsView = new app.DetailsView({
             model: model
         });

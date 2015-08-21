@@ -72,20 +72,6 @@
             <div class="content"></div>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
-        <div class="instructions">
-            <p>
-                <kbd>Left Click</kbd> node to edit
-                <br>
-                <kbd>Left Click</kbd> node <strong>Department</strong> to apply filter
-                <br>
-                <kbd>Right Click</kbd> node for context menu
-                <br>
-                <kbd>Esc</kbd> to cancel move
-                <br>
-                <kbd>Ctrl</kbd> +
-                <kbd>E</kbd> to toggle <strong>Edit</strong> mode
-            </p>
-        </div>
     </script>
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
@@ -106,12 +92,12 @@
         <a>
             <%=name%>
         </a>
-            <div class="context vcard">
-                <a class="add">Add</a>
-                <a class="edit">Edit</a>
-                <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
-                <a class="delete">Delete</a>
-            </div>
+        <div class="context vcard">
+            <a class="add">Add</a>
+            <a class="edit">Edit</a>
+            <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
+            <a class="delete">Delete</a>
+        </div>
     </script>
     <script type="text/template" id="details-item-template">
         <form>
@@ -156,6 +142,22 @@
                 <%}%>
         </form>
     </script>
+    <script type="text/template" id="instructionsTemplate">
+        <div class="instructions">
+            <p>
+                <kbd>Left Click</kbd> node to edit
+                <br>
+                <kbd>Left Click</kbd> node <strong>Department</strong> to apply filter
+                <br>
+                <kbd>Right Click</kbd> node for context menu
+                <br>
+                <kbd>Esc</kbd> to cancel move
+                <br>
+                <kbd>Ctrl</kbd> +
+                <kbd>E</kbd> to toggle <strong>Edit</strong> mode
+            </p>
+        </div>
+    </script>
     <script type="text/template" id="fetchingDataTemplate">
         <div class="text-center library-message">
             <p>Fetching data<span class="ellipsis"></span></p>
@@ -181,6 +183,7 @@
     <script src="js/views/library-item.js"></script>
     <script src="js/views/fetchingData.js"></script>
     <script src="js/views/error.js"></script>
+      <script src="js/views/instructions.js"></script>
     <script src="js/views/app.js"></script>
     <!-- Application -->
     <script src="js/data.js"></script>
@@ -191,34 +194,12 @@
     <!-- Router -->
     <script src="js/routes/routes.js"></script>
     <script>
-    $(document).foundation({})
-        .on('keydown', function(e) {
-
-            if (e.which === 69 && e.ctrlKey) {
-                e.preventDefault();
-                toggleEditMode();
-
-            }
-        });
+    $(document).foundation({});
     $('body').on('click', function(e) {
-        $('.context').hide();
-    }).on('contextmenu', function(e) {
-        var $node = $(e.target).hasClass('node') ? $(e.target) : $(e.target).parents('.node');
-        $('.context').each(function() {
-            if ($(this).parents('.node')[0] != $node[0]) {
-                $(this).hide();
-            }
-        });
+        Backbone.pubSub.trigger('context');
     });
 
-    function toggleEditMode() {
-        app.config.editing = !app.config.editing;
-        if(app.config.editing){
-            $('.instructions').show();
-        } else {
-            $('.instructions').hide();
-        }
-    }
+ 
     </script>
 </body>
 

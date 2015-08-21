@@ -8,20 +8,50 @@ app.LibraryChildren = Backbone.View.extend({
         this.collection.on('add reset remove', function() {
             this.render(this.collection);
         }, this);
-
+        this.parent = options.parent;
+        this.id_field = app.config.parent_id_field;
         Backbone.pubSub.on('add', this.addModel, this);
         Backbone.pubSub.on('delete', this.deleteModel, this);
-        Backbone.pubSub.on('done', this.render, this);
+        Backbone.pubSub.on('save', this.saveModel, this);
+        //    Backbone.pubSub.on('done', this.render, this);
     },
 
-    addModel: function(model) {
-        model = this.collection.add(model);
-    },
-
-   
-            deleteModel: function(model) {
-                this.collection.remove(model);
+    addModel: function(parent) {
+        if (this.parent.get(this.id_field) != parent.get(this.id_field)) {
+            return;
+        }
+        var model = {
+                parent: parent.get(this.id_field),
+                department: parent.get('department')
             },
+            item;
+        item = new app.Item(model);
+        item.set('id', item.get('cid'));
+
+        this.showModal(item);
+
+    },
+
+
+    saveModel: function(model) {
+        if (model.get('parent') != this.parent.get(this.id_field)) {
+            return;
+        }
+        if (!this.collection.get(model)) {
+            this.collection.add(model);
+        }
+
+        this.parent.set({
+            children: parent.get('children').concat(item)
+        });
+
+        this.render();
+
+    },
+
+    deleteModel: function(model) {
+        this.collection.remove(model);
+    },
 
     render: function(collection) {
         var that = this;

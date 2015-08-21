@@ -54,6 +54,7 @@ var Router = Backbone.Router.extend({
         });
 
 
+
         this.AppView.showView(libraryView);
     },
 
@@ -101,9 +102,9 @@ var Router = Backbone.Router.extend({
     }
 });
 
-
+var appView = new app.AppView();
 app.router = new Router({
-    AppView: app.AppView
+    AppView: appView
 });
 
 Backbone.history.start();

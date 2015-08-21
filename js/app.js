@@ -6,7 +6,8 @@ app.state_map = {
     filterOptions: false,
     fetched: {
         items: false
-    }
+    },
+    itemViewContext: null
 };
 
 app.DataFetched = function(data) {

@@ -2,7 +2,7 @@ var app = app || {};
 
 app.ListItemView = Backbone.View.extend({
     template: _.template($('#item-list-template').html()),
-    className: 'child',
+    className: 'item',
 
     events: {
         'change': 'render',
@@ -16,10 +16,11 @@ app.ListItemView = Backbone.View.extend({
 
     initialize: function(options) {
         this.model.on('change', this.render, this);
-                Backbone.pubSub.on('context', this.showContext, this);
+        Backbone.pubSub.on('context', this.showContext, this);
         Backbone.pubSub.on('select', this.selectParent, this);
         Backbone.pubSub.on('move', this.listen, this);
         Backbone.pubSub.on('done', this.doneMoving, this);
+        this.delete = false;
     },
 
     route: function(e) {
@@ -29,19 +30,27 @@ app.ListItemView = Backbone.View.extend({
     },
 
     contextmenu: function(e) {
-        var posX = this.$el.offset().left,
-            posY = this.$el.offset().top;
+        var posX,
+            posY;
+
+        if (!app.config.editing) {
+            return;
+        }
+        posX = this.$el.offset().left;
+        posY = this.$el.offset().top;
         e.preventDefault();
         this.$context.show().css({
             left: e.offsetX,
             top: e.offsetY
         });
+        Backbone.pubSub.trigger('context', this);
+        app.state_map.itemViewContext = this;
     },
 
     selectParent: function(model) {
         if (this.dragging) {
             if (this.model.get('parent') != 0) {
-                this.setChildrensParent(this.model.get('parent'));
+                //this.setChildrensParent(this.model.get('parent'));
                 this.model.set('parent', model.get(app.config.parent_id_field));
             }
             Backbone.pubSub.trigger('done');
@@ -52,7 +61,9 @@ app.ListItemView = Backbone.View.extend({
     },
 
     select: function(e) {
-        e.stopPropagation();
+        if(this.delete){
+            return;
+        }
         if (!e || $(e.target).parent('.context').length == 0) {
             if (!this.listening && !this.dragging) {
                 this.closeContext();
@@ -68,7 +79,6 @@ app.ListItemView = Backbone.View.extend({
 
     closeContext: function(e) {
         this.$context.hide();
-        $('.context-bg').remove();
     },
     edit: function(e) {
         this.select();
@@ -85,20 +95,17 @@ app.ListItemView = Backbone.View.extend({
         if (e.target.className.indexOf('disabled') > -1) {
             return;
         }
+        this.delete = true;
         Backbone.pubSub.trigger('delete', this.model);
         this.closeContext();
     },
 
     listen: function(model) {
         if (model != this.model) {
-            //if (this.childOf(model)) {
-            //      this.$node.addClass('child');
-            //  } else {
             this.listening = true;
-            this.$node.addClass('listen');
-            // }
+            this.$el.addClass('listen');
         } else {
-            this.$node.addClass('moving');
+            this.$el.addClass('moving');
         }
     },
     onClose: function() {
@@ -111,13 +118,6 @@ app.ListItemView = Backbone.View.extend({
     },
     childOf: function(model) {
         var parents = this.model.get('parents');
-        console.log(this.model.get('name'));
-        console.log('checking: ', model.get('name'));
-        if (parents.length > 0) {
-            console.log(parents.reduce(function(a, b) {
-                return (a.length > 0 ? a.concat(b.get('name')) : [a.get('name'), b.get('name')])
-            }));
-        }
         return parents.indexOf(model) > -1;
     },
 
@@ -148,7 +148,7 @@ app.ListItemView = Backbone.View.extend({
     },
 
     doneMoving: function() {
-        this.$node.removeClass('moving listen child');
+        this.$el.removeClass('moving listen child');
         this.listening = false;
         this.dragging = false;
         if (this.$draggable) {
@@ -164,7 +164,6 @@ app.ListItemView = Backbone.View.extend({
     render: function() {
         this.$el.html(this.template(this.model.toJSON()));
         this.$context = this.$('.context');
-        this.$node = this.$('.node');
         this.$draggable = this.$draggable || false;
         this.dragging = false;
 
