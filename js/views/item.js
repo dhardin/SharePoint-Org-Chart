@@ -12,7 +12,7 @@ app.ItemView = Backbone.View.extend({
         'click .move': 'move',
         'click .edit': 'edit',
         'click a': 'route',
-        contextmenu: 'contextmenu'
+        'contextmenu': 'contextmenu'
     },
 
     initialize: function(options) {
@@ -53,6 +53,7 @@ app.ItemView = Backbone.View.extend({
         if (this.dragging) {
             if (this.model.get('parent') != 0) {
                 this.model.set('parent', model.get(app.config.parent_id_field));
+                 this.model.save();
             }
             Backbone.pubSub.trigger('done');
         }

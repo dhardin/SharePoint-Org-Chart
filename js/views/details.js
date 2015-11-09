@@ -19,6 +19,7 @@ app.DetailsView = Backbone.View.extend({
         });
         this.model.set(save_fields);
         this.$('.close-reveal-modal').click();
+        this.model.save();
         Backbone.pubSub.trigger('save', this.model);
     },
     cancel: function() {

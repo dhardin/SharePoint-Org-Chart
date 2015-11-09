@@ -106,15 +106,15 @@ app.data = (function(){
     // End Utility Method /_getListItems/
 
     // Begin Utility Method /saveData/
-    saveData = function(dataObjArr, type){
+    saveData = function(dataObjArr){
         var url = dataObjArr.url,
         data = dataObjArr.data,
         guid = dataObjArr.guid,
         callback = dataObjArr.callback,
         method = dataObjArr.method;
 
-         _buildPayload(data, 0, {}, method, '', function (results) {
-                _saveListItem(url, guid, results, function(results){
+         _buildPayload(data, 0, {}, method, '', function (payload) {
+                _saveListItem(url, guid, payload, function(results){
                     if(callback){
                         callback(results);
                     }

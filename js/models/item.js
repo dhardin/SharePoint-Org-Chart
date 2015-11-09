@@ -17,7 +17,16 @@ app.Item = Backbone.Model.extend({
         if(this.get('name').length == 0 && this.get('firstName').length > 0){
             this.set('name') = this.get('firstName') + ' ' + this.get('lastName');
         }
-
-
+    },
+    save: function(){
+        app.data.saveData([{
+            data: this.model.toJSON(),
+            url: app.config.url,
+            guid: app.config.guid,
+            method: 'update',
+            callback: function(results){
+                console.log('save complete!');
+            }
+        }]);
     }
 });
