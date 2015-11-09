@@ -19,14 +19,14 @@ app.Item = Backbone.Model.extend({
         }
     },
     save: function(){
-        app.data.saveData([{
-            data: this.model.toJSON(),
+        app.data.saveData({
+            data: [this.toJSON()],
             url: app.config.url,
             guid: app.config.guid,
             method: 'update',
             callback: function(results){
                 console.log('save complete!');
             }
-        }]);
+        });
     }
 });

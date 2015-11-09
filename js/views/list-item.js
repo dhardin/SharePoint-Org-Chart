@@ -52,6 +52,7 @@ app.ListItemView = Backbone.View.extend({
             if (this.model.get('parent') != 0) {
                 //this.setChildrensParent(this.model.get('parent'));
                 this.model.set('parent', model.get(app.config.parent_id_field));
+                this.model.save();
             }
             Backbone.pubSub.trigger('done');
         }
