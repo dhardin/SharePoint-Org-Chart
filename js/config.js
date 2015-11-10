@@ -11,6 +11,7 @@ app.config = {
 	property_map: {
 			ows_title: 'lastName',
 			ows_name: 'name',
+			ows_firstname: 'firstName',
 	    	ows_unit: 'department',
 	    	ows_supervisor: 'parent',
 	    	ows_workphone: 'phone',
