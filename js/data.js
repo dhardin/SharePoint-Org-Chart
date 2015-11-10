@@ -112,7 +112,7 @@ app.data = (function(){
             return;
         }
         for (key in obj){
-            staticObj = app.config.static_names[key];
+            staticObj[app.config.static_names[key]] = obj[key];
         }
         return staticObj;
     };
