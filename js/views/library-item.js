@@ -1,7 +1,7 @@
 var app = app || {};
 
 app.LibraryChildren = Backbone.View.extend({
-    template: _.template($('#item-list-template').html()),
+    template: _.template($('#item-collection-template').html()),
     className: 'node child-collection',
     initialize: function(options) {
         this.collection = options.collection;
@@ -13,7 +13,6 @@ app.LibraryChildren = Backbone.View.extend({
         Backbone.pubSub.on('add', this.addModel, this);
         Backbone.pubSub.on('delete', this.deleteModel, this);
         Backbone.pubSub.on('save', this.saveModel, this);
-        //    Backbone.pubSub.on('done', this.render, this);
     },
 
     addModel: function(parent) {
