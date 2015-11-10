@@ -20,7 +20,7 @@ app.Item = Backbone.Model.extend({
             data: [this.toJSON()],
             url: app.config.url,
             guid: app.config.guid,
-            method: 'update',
+            method: this.get('id') ? 'update' : 'add',
             callback: function(results){
                 console.log('save complete!');
             }
