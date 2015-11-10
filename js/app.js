@@ -40,13 +40,7 @@ app.itemFetchData = function() {
                 guid: app.config.guid,
                 callback: function(results) {
                     app.state_map.fetchingData = false;
-                    results = app.processResults(results, function(key, value) {
-                        if (key == 'name' || key == 'parent') {
-                            return value.split('#')[1];
-                        } else {
-                            return value;
-                        }
-                    });
+                    results = app.processResults(results);
                     //set library to results
                     app.ItemCollection = new app.Library(results);
                     //app.ItemCollection.trigger('change');
