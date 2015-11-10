@@ -104,6 +104,19 @@ app.data = (function(){
         });
     };
     // End Utility Method /_getListItems/
+    
+    // Begin Utilitiy method /_convertToStaticAttr/
+    _convertToStaticAttr: function(obj){
+        var staticObj = {}, key;
+        if(!app.config.static_names){
+            return;
+        }
+        for (key in obj){
+            staticObj = app.config.static_names[key];
+        }
+        return staticObj;
+    }
+    // End Utility method /_convertToStaticAttr/
 
     // Begin Utility Method /saveData/
     saveData = function(dataObjArr){
@@ -167,7 +180,7 @@ app.data = (function(){
 
     // Begin Utility Method /_buildPayload/
     _buildPayload = function (arr, index, obj_map, method, payload, callback) {
-        var i,
+        var i, obj,
             method_map = {
                 'new': 'New',
                 'update': 'Update',
@@ -187,9 +200,11 @@ app.data = (function(){
         method = method_map[method];
 
         if(index < arr.length){
-            for (key in arr[index]) {
+            obj = arr[index];
+            obj = _convertToStaticAttr(obj);
+            for (key in obj) {
                 fieldName = key;
-                fieldValue = app.browser_util.encodeXml(arr[index][key]);
+                fieldValue = app.browser_util.encodeXml(obj[key]);
                 fieldPayload += '<Field Name="' + fieldName + '">' + fieldValue + '</Field>';
             }
 

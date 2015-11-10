@@ -17,5 +17,15 @@ app.config = {
 	    	ows_email: 'email',
 	    	ows_jobtitle: 'title',
 	    	ows_id: 'id'
+	},
+	static_names: {
+		lastName: 'Title',
+		name: 'Name',
+		department: 'Unit',
+		parent: 'Supervisor',
+		phone: 'WorkPhone',
+		email: 'Email',
+		title: 'JobTitle',
+		id: 'ID'
 	}
 };
