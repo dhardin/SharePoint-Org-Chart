@@ -124,8 +124,6 @@ app.ItemView = Backbone.View.extend({
 
     childOf: function(model) {
         var parents = this.model.get('parents');
-        console.log(this.model.get('name'));
-        console.log('checking: ', model.get('name'));
         if (parents.length > 0) {
             console.log(parents.reduce(function(a, b) {
                 return (a.length > 0 ? a.concat(b.get('name')) : [a.get('name'), b.get('name')])

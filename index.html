@@ -75,7 +75,7 @@
     </script>
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
-            <h5><%=name%></h5>
+            <h5><%=firstName%> <%=lastName%></h5>
             <h5 class="subheader"><a href="#department/<%=department%>"><%=department%></a></h5>
             <h6 class="subheader"><%=title%></h6>
             <div class="context vcard">
@@ -90,7 +90,7 @@
     </script>
     <script type="text/template" id="item-list-template">
         <a>
-            <%=name%>
+            <%=firstName%>  <%=lastName%>
         </a>
         <div class="context vcard">
             <a class="add">Add</a>
@@ -103,33 +103,30 @@
         <form>
             <div class="row">
                 <div class="large-12 columns">
-                    <label>Name
-                        <input type="text" class="name" value="<%=name%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
+                    <label>First Name
+                        <input type="text" class="firstName" value="<%=firstName%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
                     </label>
                 </div>
-            </div>
-            <div class="row">
+                   <div class="large-12 columns">
+                    <label>Last Name
+                        <input type="text" class="lastName" value="<%=lastName%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
+                    </label>
+                </div>
                 <div class="large-12 columns">
                     <label>Email
                         <input type="email" class="email" value="<%=email%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
                     </label>
                 </div>
-            </div>
-            <div class="row">
                 <div class="large-12 columns">
                     <label>Phone
                         <input type="tel" class="phone" value="<%=phone%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
                     </label>
                 </div>
-            </div>
-            <div class="row">
                 <div class="large-12 columns">
                     <label>Department
                         <input type="text" class="department" value="<%=department%>" <%=( app.config.editing ? '' : 'disabled' ) %>/>
                     </label>
                 </div>
-            </div>
-            <div class="row">
                 <div class="large-12 columns">
                     <label>Title
                         <input type="text" class="title" value="<%=title%>" <%=( app.config.editing ? '': 'disabled' ) %>/>
