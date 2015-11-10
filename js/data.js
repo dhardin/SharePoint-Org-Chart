@@ -106,7 +106,7 @@ app.data = (function(){
     // End Utility Method /_getListItems/
     
     // Begin Utilitiy method /_convertToStaticAttr/
-    _convertToStaticAttr: function(obj){
+    _convertToStaticAttr= function(obj){
         var staticObj = {}, key;
         if(!app.config.static_names){
             return;
@@ -115,7 +115,7 @@ app.data = (function(){
             staticObj = app.config.static_names[key];
         }
         return staticObj;
-    }
+    };
     // End Utility method /_convertToStaticAttr/
 
     // Begin Utility Method /saveData/
@@ -134,7 +134,7 @@ app.data = (function(){
                     
                 });
             });
-    }
+    };
     // End Utility Method /saveData/
 
      // Begin Utility Method /_saveListItem/
