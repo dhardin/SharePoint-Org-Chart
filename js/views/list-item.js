@@ -52,7 +52,7 @@ app.ListItemView = Backbone.View.extend({
             if (this.model.get('parent') != 0) {
                 //this.setChildrensParent(this.model.get('parent'));
                 this.model.set('parent', model.get(app.config.parent_id_field));
-                this.model.save();
+                this.model.save('update');
             }
             Backbone.pubSub.trigger('done');
         }
@@ -97,6 +97,7 @@ app.ListItemView = Backbone.View.extend({
             return;
         }
         this.pendingDelete = true;
+        this.model.save('delete');
         Backbone.pubSub.trigger('delete', this.model);
         this.closeContext();
     },

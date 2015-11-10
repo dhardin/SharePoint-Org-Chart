@@ -192,6 +192,10 @@ app.data = (function() {
 
         method = method_map[method];
 
+        if(!method){
+            return;
+        }
+
         if (index < arr.length) {
             obj = arr[index];
             obj = _convertToStaticAttr(obj);
@@ -212,8 +216,6 @@ app.data = (function() {
         } else {
             return payload;
         }
-
-
     };
     // End Utility Method /_buildPayload/
 
