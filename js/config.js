@@ -21,7 +21,7 @@ app.config = {
 	},
 	static_names: {
 		lastName: 'Title',
-		name: 'Name',
+		firstName: 'FirstName',
 		department: 'Unit',
 		parent: 'Supervisor',
 		phone: 'WorkPhone',
