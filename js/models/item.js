@@ -2,7 +2,6 @@ var app = app || {};
 
 app.Item = Backbone.Model.extend({
     defaults: {
-        name: 'N/A',
         firstName: 'N/A',
         lastName: 'N/A',
         email: 'N/A',
@@ -14,9 +13,7 @@ app.Item = Backbone.Model.extend({
         children: []
     },
     initialize: function(){
-        if(this.get('name').length == 0 && this.get('firstName').length > 0){
-            this.set('name') = this.get('firstName') + ' ' + this.get('lastName');
-        }
+    
     },
     save: function(){
         app.data.saveData({
