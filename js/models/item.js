@@ -14,11 +14,20 @@ app.Item = Backbone.Model.extend({
         children: []
     },
     initialize: function(){
+      this.setName();  
+    },
+    setName: function () {
         this.set('name', this.get('firstName') + ' ' + this.get('lastName'));
     },
-    save: function(method){
+    updateChildrensParent: function(){
+        var parentName = this.get('name');
+        this.get('children').each(function(model){
+            model.set('parent', parentName);
+        });
+    }
+    save: function(method, data){
         app.data.saveData({
-            data: [this.toJSON()],
+            data: data || [this.toJSON()],
             url: app.config.url,
             guid: app.config.guid,
             method: method,
