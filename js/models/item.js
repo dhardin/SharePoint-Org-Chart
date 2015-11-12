@@ -24,7 +24,7 @@ app.Item = Backbone.Model.extend({
             method: method,
             callback: function(results){
                 console.log('save complete!');
-                if(results.error == ""){
+                if(results.error != "" || method != 'new'){
                     return;
                 }
                 results = app.processResults(results.data);
