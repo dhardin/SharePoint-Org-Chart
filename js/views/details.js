@@ -15,7 +15,7 @@ app.DetailsView = Backbone.View.extend({
     save: function() {
         var save_fields = {}, that = this;
         this.$('input').each(function() {
-            if (this.className != that.model.get(this.className)) {
+            if (this.value != that.model.get(this.className)) {
                 save_fields[this.className] = this.value;
             }
         });
