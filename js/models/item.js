@@ -24,7 +24,7 @@ app.Item = Backbone.Model.extend({
         this.get('children').each(function(model){
             model.set('parent', parentName);
         });
-    }
+    },
     save: function(method, data){
         app.data.saveData({
             data: data || [this.toJSON()],
