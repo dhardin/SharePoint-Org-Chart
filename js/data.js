@@ -204,7 +204,7 @@ app.data = (function() {
             payload += '<Method ID="' + (index + 1) + '" Cmd="' + method + '">' + (method.toLowerCase() == 'new' ? '<Field Name="ID">New</Field>' : '') + fieldPayload + '</Method>';
             index++;
 
-            _buildPayload(arr, index, obj_map, method, payload, callback);
+            _buildPayload(arr, index, obj_map, method.toLowerCase(), payload, callback);
 
         } else if (callback) {
             callback(payload);
