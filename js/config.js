@@ -4,13 +4,12 @@ var app = app || {};
 app.config = {
 	url: '',
 	guid: '',
-	parent_id_field: 'id',
+	parent_id_field: 'name',
 	tryCount: 3,
 	testing: true,
 	editing: false,
 	property_map: {
 			ows_title: 'lastName',
-			ows_name: 'name',
 			ows_firstname: 'firstName',
 	    	ows_unit: 'department',
 	    	ows_supervisor: 'parent',

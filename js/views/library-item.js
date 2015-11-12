@@ -143,7 +143,6 @@ app.LibraryChildren = Backbone.View.extend({
         }
         this.searchNum++;
         if (collection.length > 0) {
-
             regex = new RegExp(this.searchQuery, 'gi');
             this.renderItems(collection.models, 0, this.searchNum, true, regex);
         }

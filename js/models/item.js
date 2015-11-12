@@ -7,13 +7,14 @@ app.Item = Backbone.Model.extend({
         email: 'N/A',
         id: 'N/A',
         title: 'N/A',
+        name: 'N/A',
         parent: '',
         phone: 'N/A',
         department: 'N/A',
         children: []
     },
     initialize: function(){
-    
+        this.set('name', this.get('firstName') + ' ' + this.get('lastName'));
     },
     save: function(method){
         app.data.saveData({
