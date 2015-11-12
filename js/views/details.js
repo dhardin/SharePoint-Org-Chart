@@ -15,19 +15,19 @@ app.DetailsView = Backbone.View.extend({
     save: function() {
         var save_fields = {};
         this.$('input').each(function() {
-            if (this.className != this.get(this.className)) {
+            if (this.className != this.model.get(this.className)) {
                 save_fields[this.className] = this.value;
             }
         });
 
         this.model.set(save_fields);
-        
+
         //if model's name changed, update children's parent
         if(save_fields.firstName || save_fields.lastName) {
             var saveArr = [];
-            this.setName();
-            this.updateChildrensParent();
-            this.get('children').each(function(model){
+            this.model.setName();
+            this.model.updateChildrensParent();
+            this.model.get('children').each(function(model){
                 saveArr.push(model.toJSON());
             });
             saveArr.push(this.model.toJSON());
