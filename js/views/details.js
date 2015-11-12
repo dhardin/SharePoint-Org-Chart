@@ -27,7 +27,7 @@ app.DetailsView = Backbone.View.extend({
             var saveArr = [];
             this.model.setName();
             this.model.updateChildrensParent();
-            this.model.get('children').each(function(model){
+            this.model.get('children').forEach(function(model){
                 saveArr.push(model.toJSON());
             });
             saveArr.push(this.model.toJSON());

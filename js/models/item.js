@@ -21,7 +21,7 @@ app.Item = Backbone.Model.extend({
     },
     updateChildrensParent: function(){
         var parentName = this.get('name');
-        this.get('children').each(function(model){
+        this.get('children').forEach(function(model){
             model.set('parent', parentName);
         });
     },
