@@ -2,12 +2,13 @@ var app = app || {};
 
 
 app.config = {
-	url: '',
-	guid: '',
+    url: 'https://members.lcmp.csd.disa.mil/sites/jltv/portal',
+    guid: '882F70A5-8498-489D-B927-E973D8A67DB7',
 	parent_id_field: 'name',
 	tryCount: 3,
-	testing: true,
+	testing: false,
 	editing: false,
+	showTitle: true,
 	property_map: {
 			ows_title: 'lastName',
 			ows_firstname: 'firstName',

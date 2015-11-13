@@ -91,6 +91,9 @@
     <script type="text/template" id="item-list-template">
         <a>
             <%=firstName%>  <%=lastName%>
+            <% if(app.config.showTitle){%>
+                 <br/><span class="label secondary radius"><%=title%></span>
+                <%}%>
         </a>
         <div class="context vcard">
             <a class="add">Add</a>
