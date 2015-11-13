@@ -10,11 +10,6 @@ app.LibraryView = Backbone.View.extend({
         this.department = options.department;
         this.id_field = app.config.parent_id_field;
 
-        Backbone.pubSub.on('showModal', this.showModal, this);
-        Backbone.pubSub.on('add', this.addModel, this);
-        Backbone.pubSub.on('delete', this.deleteModel, this);
-        Backbone.pubSub.on('save', this.saveModel, this);
-        Backbone.pubSub.on('done', this.render, this);
         this.parent_cache = {};
         this.parent_id_cache = {};
     },
@@ -83,6 +78,15 @@ app.LibraryView = Backbone.View.extend({
     render: function(collection) {
         var modelAttributArr, that = this,
             parent, instructionsView;
+
+            
+        if (!Backbone.pubSub._events['showModal']) {
+            Backbone.pubSub.on('showModal', this.showModal, this);
+            Backbone.pubSub.on('add', this.addModel, this);
+            Backbone.pubSub.on('delete', this.deleteModel, this);
+            Backbone.pubSub.on('save', this.saveModel, this);
+            Backbone.pubSub.on('done', this.render, this);
+        }
 
         this.childViews = [];
 
