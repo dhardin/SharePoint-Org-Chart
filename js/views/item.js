@@ -78,6 +78,9 @@ app.ItemView = Backbone.View.extend({
         //update model chilren's parent
         this.model.updateChildrensParent();
         model.updateChildrensParent();
+
+        this.model.save('update', [this.model.toJSON(), model.toJSON()]);
+        Backbone.pubSub.trigger('done');
     },
 
     selectParent: function(model) {
@@ -98,7 +101,7 @@ app.ItemView = Backbone.View.extend({
         }
     },
     select: function(e) {
-        if (this.pendingDelete || 
+        if (this.pendingDelete ||
             (e && $(e.target).parent('.context').length > 0 || e.target.nodeName == 'A')) {
             return;
         }
