@@ -17,27 +17,6 @@
     <script type="text/javascript" src="lib/foundation/js/foundation.min.js"></script>
     <script type="text/javascript" src="lib/foundation/js/vendor/modernizr.js"></script>
     <script type="text/javascript" src="lib/d3.js"></script>
-    <style>
-    .node {
-        cursor: pointer;
-    }
-    
-    .node circle {
-        fill: #fff;
-        stroke: steelblue;
-        stroke-width: 3px;
-    }
-    
-    .node text {
-        font: 1em sans-serif;
-    }
-    
-    .link {
-        fill: none;
-        stroke: #ccc;
-        stroke-width: 2px;
-    }
-    </style>
 </head>
 
 <body>
@@ -81,8 +60,22 @@
             <div class="context vcard">
                 <a class="add">Add</a>
                 <a class="edit">Edit</a>
+                <a class="swap">Swap</a>
                 <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
                 <a class="<%=(children.length > 0 ? 'disabled' : 'delete')%>">Delete</a>
+            </div>
+        </div>
+    </script>
+    <script type="text/template" id="item-blank-template">
+        <div class='node' node-id="<%=id%>">
+            <h5>BLANK</h5>
+            <h5 class="subheader"><a href="#department/<%=department%>"><%=department%></a></h5>
+            <h6 class="subheader"><%=title%></h6>
+            <div class="context vcard">
+                <a class="link">Link</a>
+                <a class="new">New</a>
+                <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
+                <a class="<%=(parent == 0 ? 'disabled' : 'delete')%>">Delete</a>
             </div>
         </div>
     </script>
@@ -98,6 +91,7 @@
         <div class="context vcard">
             <a class="add">Add</a>
             <a class="edit">Edit</a>
+            <a class="swap">Swap</a>
             <a class="<%=(parent == 0 ? 'disabled' : 'move')%>">Move</a>
             <a class="delete">Delete</a>
         </div>

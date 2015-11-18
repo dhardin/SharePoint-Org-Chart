@@ -4,7 +4,6 @@ app.ItemView = Backbone.View.extend({
     template: _.template($('#item-template').html()),
 
     events: {
-
         'change': 'render',
         'click .node': 'select',
         'click .add': 'add',
@@ -18,11 +17,12 @@ app.ItemView = Backbone.View.extend({
     initialize: function(options) {
         this.model.on('change', this.render, this);
         Backbone.pubSub.on('context', this.showContext, this);
-        Backbone.pubSub.on('select', this.selectParent, this);
+        Backbone.pubSub.on('select', this.onSelect, this);
         Backbone.pubSub.on('move', this.listen, this);
         Backbone.pubSub.on('done', this.doneMoving, this);
         Backbone.pubSub.on('setParent', this.setParent, this);
         this.delete = false;
+        this.action = false;
     },
 
     route: function(e) {
@@ -49,14 +49,47 @@ app.ItemView = Backbone.View.extend({
         app.state_map.itemViewContext = this;
     },
 
-    selectParent: function(model) {
-        if (this.dragging) {
-            if (this.model.get('parent') != 0) {
-                this.model.set('parent', model.get(app.config.parent_id_field));
-                 this.model.save('update');
-            }
-            Backbone.pubSub.trigger('done');
+    onSelect: function(model) {
+        switch (this.action) {
+            case 'move':
+                this.selectParent(model);
+                break;
+            case 'swap':
+                this.swapModels(model);
+                break;
+            default:
+                break;
         }
+        this.action = false;
+    },
+
+    swapModels: function(model) {
+        var tempParent = this.model.get('parent'),
+            tempChildren = this.model.get('children');
+
+        //swap model parent and chilren attributes
+        this.model.set('parent', model.get('parent'));
+        this.model.set('children', model.get('children'));
+
+        model.set('parent', tempParent);
+        model.set('children', tempChildren);
+
+        //update model chilren's parent
+        this.model.updateChildrensParent();
+        model.updateChildrensParent();
+    },
+
+    selectParent: function(model) {
+        if (!this.dragging) {
+            return;
+        }
+
+        if (this.model.get('parent') != 0) {
+            this.model.set('parent', model.get(app.config.parent_id_field));
+            this.model.save('update');
+        }
+        Backbone.pubSub.trigger('done');
+
     },
     setParent: function(parent, newParent) {
         if (this.model.get('parent') == parent) {
@@ -64,20 +97,18 @@ app.ItemView = Backbone.View.extend({
         }
     },
     select: function(e) {
-        if(this.pendingDelete){
+        if (this.pendingDelete || e || $(e.target).parent('.context').length > 0 && e.target.nodeName == 'A') {
             return;
         }
-        if (!e || $(e.target).parent('.context').length == 0 && e.target.nodeName != 'A') {
-            if (!this.listening && !this.dragging) {
-                this.closeContext();
-                Backbone.pubSub.trigger('showModal', this.model);
-            } else if (this.dragging) {
-                Backbone.pubSub.trigger('done');
-            } else {
-                Backbone.pubSub.trigger('select', this.model);
-            }
-        }
 
+        if (!this.listening && !this.dragging) {
+            this.closeContext();
+            Backbone.pubSub.trigger('showModal', this.model);
+        } else if (this.dragging) {
+            Backbone.pubSub.trigger('done');
+        } else {
+            Backbone.pubSub.trigger('select', this.model);
+        }
     },
 
     closeContext: function(e) {
@@ -89,10 +120,17 @@ app.ItemView = Backbone.View.extend({
     },
 
     add: function(e) {
-
         Backbone.pubSub.trigger('add', this.model);
         this.closeContext();
     },
+
+    swap: function(e) {
+        this.closeContext();
+        this.setDraggable();
+        this.action = 'swap';
+        Backbone.pubSub.trigger('move', this.model);
+    },
+
 
 
     delete: function(e) {
@@ -128,29 +166,10 @@ app.ItemView = Backbone.View.extend({
     },
 
     move: function(e) {
-        var $draggable, that = this;
-
         this.closeContext();
-        this.$draggable = $('<div class="draggable">' + this.$el.html() + '</div>');
-        $('body').append(this.$draggable);
-        this.dragging = true;
+        this.setDraggable();
+        this.action = 'move';
         Backbone.pubSub.trigger('move', this.model);
-
-
-
-        $('body').on('mousemove', function(e) {
-            that.$draggable.css({
-                left: e.pageX + 2,
-                top: e.pageY + 2
-            });
-        }).css({
-            'cursor': '-webkit-grabbing'
-        });
-        $(document).on('keyup', function(e) {
-            if (e.which == 27) {
-                Backbone.pubSub.trigger('done');
-            }
-        });
     },
 
     doneMoving: function() {
@@ -165,6 +184,26 @@ app.ItemView = Backbone.View.extend({
             'cursor': 'auto'
         });
         $(document).off('keyup');
+    },
+
+    setDraggable: function() {
+        var that = this;
+        this.$draggable = $('<div class="draggable">' + this.$el.html() + '</div>');
+        $('body').append(this.$draggable);
+        this.dragging = true;
+        $('body').on('mousemove', function(e) {
+            that.$draggable.css({
+                left: e.pageX + 2,
+                top: e.pageY + 2
+            });
+        }).css({
+            'cursor': '-webkit-grabbing'
+        });
+        $(document).on('keyup', function(e) {
+            if (e.which == 27) {
+                Backbone.pubSub.trigger('done');
+            }
+        });
     },
 
     render: function() {

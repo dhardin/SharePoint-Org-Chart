@@ -11,10 +11,14 @@ app.Item = Backbone.Model.extend({
         parent: '',
         phone: 'N/A',
         department: 'N/A',
+        isBlankNode: false,
         children: []
     },
     initialize: function(){
-      this.setName();  
+      //check to see if it is a blank node
+      if(!this.get('isBlankNode')){
+        this.setName();
+      }
     },
     setName: function () {
         this.set('name', this.get('firstName') + ' ' + this.get('lastName'));

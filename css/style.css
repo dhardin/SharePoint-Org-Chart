@@ -132,7 +132,7 @@ div.orgChart tr.lines td.right {
 }
 
 .orgChart .moving:hover,
-.orgChart .child:hover{
+.orgChart .child:hover {
     box-shadow: 0px 0px 10px red;
     cursor: not-allowed;
 }
@@ -149,4 +149,24 @@ div.orgChart tr.lines td.right {
 
 .node.child-collection .item .context {
     position: absolute;
+}
+
+.node {
+    cursor: pointer;
+}
+
+.node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 3px;
+}
+
+.node text {
+    font: 1em sans-serif;
+}
+
+.link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
 }
