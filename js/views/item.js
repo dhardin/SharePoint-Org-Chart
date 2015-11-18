@@ -70,9 +70,8 @@ app.ItemView = Backbone.View.extend({
             saveArr = [];
 
         //swap model parent and chilren attributes
-        this.model.set('parent', model.get('parent'));
+        this.model.set('parent',  this.model.get('name') != model.get('parent') ?  model.get('parent') : model.get('name'));
         this.model.set('children', $.extend(true, [], model.get('children')));
-
 
         model.set('parent', tempParent != model.get('name') ? tempParent : this.model.get('name'));
         model.set('children', tempChildren);
