@@ -73,7 +73,8 @@ app.ItemView = Backbone.View.extend({
         this.model.set('parent', model.get('parent'));
         this.model.set('children', model.get('children'));
 
-        model.set('parent', tempParent);
+
+        model.set('parent', tempParent != model.get('name') ? tempParent : this.model.get('name'));
         model.set('children', tempChildren);
 
         //update model chilren's parent
