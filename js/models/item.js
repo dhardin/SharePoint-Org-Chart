@@ -24,10 +24,20 @@ app.Item = Backbone.Model.extend({
         this.set('name', this.get('firstName') + ' ' + this.get('lastName'));
     },
     updateChildrensParent: function(){
-        var parentName = this.get('name');
-        this.get('children').forEach(function(model){
-            model.set('parent', parentName);
+        var parentName = this.get('name'),
+            removeIndex = false;
+        this.get('children').forEach(function(model, index){
+            if(model.get('name') != parentName){
+                model.set('parent', parentName);
+            } else {
+                removeIndex = index;
+            }
         });
+        if(!removeIndex){
+            return;
+        }
+        
+        this.set('children', this.get('children').splice(removeIndex, 1));
     },
     save: function(method, data){
         app.data.saveData({
