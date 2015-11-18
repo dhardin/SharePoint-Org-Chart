@@ -9,6 +9,7 @@ app.ItemView = Backbone.View.extend({
         'click .add': 'add',
         'click .delete': 'delete',
         'click .move': 'move',
+        'click .swap': 'swap',
         'click .edit': 'edit',
         'click a': 'route',
         'contextmenu': 'contextmenu'
