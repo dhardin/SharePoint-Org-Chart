@@ -66,7 +66,8 @@ app.ItemView = Backbone.View.extend({
 
     swapModels: function(model) {
         var tempParent = this.model.get('parent'),
-            tempChildren = this.model.get('children');
+            tempChildren = this.model.get('children'),
+            saveArr = [];
 
         //swap model parent and chilren attributes
         this.model.set('parent', model.get('parent'));
@@ -78,8 +79,15 @@ app.ItemView = Backbone.View.extend({
         //update model chilren's parent
         this.model.updateChildrensParent();
         model.updateChildrensParent();
+        this.model.get('children').forEach(function(model) {
+            saveArr.push(model.toJSON());
+        });
+        model.get('children').forEach(function(model) {
+            saveArr.push(model.toJSON());
+        });
+        saveArr.push(this.model.toJSON(), model.toJSON())
 
-        this.model.save('update', [this.model.toJSON(), model.toJSON()]);
+        this.model.save('update', saveArr);
         Backbone.pubSub.trigger('done');
     },
 
