@@ -170,6 +170,7 @@ app.ItemView = Backbone.View.extend({
         Backbone.pubSub.on('context');
         Backbone.pubSub.off('select');
         Backbone.pubSub.off('move');
+        Backbone.pubSub.off('swap');
         Backbone.pubSub.off('done');
         Backbone.pubSub.off('setParent');
     },
