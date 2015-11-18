@@ -98,7 +98,8 @@ app.ItemView = Backbone.View.extend({
         }
     },
     select: function(e) {
-        if (this.pendingDelete || e || $(e.target).parent('.context').length > 0 && e.target.nodeName == 'A') {
+        if (this.pendingDelete || 
+            (e && $(e.target).parent('.context').length > 0 || e.target.nodeName == 'A')) {
             return;
         }
 
