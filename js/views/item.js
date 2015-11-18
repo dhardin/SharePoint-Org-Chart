@@ -85,7 +85,7 @@ app.ItemView = Backbone.View.extend({
         model.get('children').forEach(function(model) {
             saveArr.push(model.toJSON());
         });
-        saveArr.push(this.model.toJSON(), model.toJSON())
+        saveArr.push(this.model.toJSON(), model.toJSON());
 
         this.model.save('update', saveArr);
         Backbone.pubSub.trigger('done');
