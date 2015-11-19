@@ -25,7 +25,7 @@ app.Item = Backbone.Model.extend({
     },
     updateChildrensParent: function(){
         var parentName = this.get('name'),
-            removeIndex = false;
+            removeIndex = false, children =  $.extend(true, [], this.get('children'));
         this.get('children').forEach(function(model, index){
             if(model.get('name') != parentName){
                 model.set('parent', parentName);
@@ -36,8 +36,10 @@ app.Item = Backbone.Model.extend({
         if(!removeIndex){
             return;
         }
-        
-        this.set('children', this.get('children').splice(removeIndex, 1));
+
+        children.splice(removeIndex, 1);
+
+        this.set('children', children);
     },
     save: function(method, data){
         app.data.saveData({
