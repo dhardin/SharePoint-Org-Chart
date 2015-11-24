@@ -35,7 +35,7 @@ var Router = Backbone.Router.extend({
 
     orgchart: function(department) {
         var fetchingDataView, libraryView,
-        department = decodeURI(department);
+        department = department ? decodeURI(department) : false;
         if (!app.state_map.fetched.items) {
             app.itemFetchData();
         }
