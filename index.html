@@ -58,7 +58,7 @@
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
             <h5><%=firstName%> <%=lastName%></h5>
-            <h5 class="subheader"><a href="#department/<%=encodeURI(department)%>"><%=department%></a></h5>
+            <h5 class="subheader"><a href="#department/<%=encodeURIComponent(department)%>"><%=department%></a></h5>
             <h6 class="subheader"><%=title%></h6>
             <div class="context vcard">
                 <a class="add">Add</a>
@@ -72,7 +72,7 @@
     <script type="text/template" id="item-blank-template">
         <div class='node' node-id="<%=id%>">
             <h5>BLANK</h5>
-            <h5 class="subheader"><a href="#department/<%= encodeURI(department)%>"><%=department%></a></h5>
+            <h5 class="subheader"><a href="#department/<%= encodeURIComponent(department)%>"><%=department%></a></h5>
             <h6 class="subheader"><%=title%></h6>
             <div class="context vcard">
                 <a class="link">Link</a>
