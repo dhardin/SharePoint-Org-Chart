@@ -24,13 +24,16 @@
         <nav class="top-bar" data-topbar role="navigation">
             <ul class="title-area">
                 <li class="name">
-                    <h1><a href="#"></a></h1>
+                    <h1><a href="#">Org Chart</a></h1>
                 </li>
                 <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
                 <li class="toggle-topbar menu-icon"><a><span>Menu</span></a>
                 </li>
             </ul>
             <section class="top-bar-section">
+                <ul class="left">
+                     <li class="active notification-container"><a class="notification"></a></li>
+                </ul>
                 <!-- Right Nav Section -->
                 <ul class="right">
                     <li class="has-dropdown">
@@ -121,7 +124,7 @@
                 </div>
                 <div class="large-12 columns">
                     <label>Department
-                        <input type="text" class="department" value="<%=department%>" <%=( app.config.editing ? '' : 'disabled' ) %>/>
+                        <input type="text" class="department" value="<%=department%>" pattern="no_forward_slash" <%=( app.config.editing ? '' : 'disabled' ) %>/>
                     </label>
                 </div>
                 <div class="large-12 columns">
@@ -188,7 +191,13 @@
     <!-- Router -->
     <script src="js/routes/routes.js"></script>
     <script>
-    $(document).foundation({});
+    $(document).foundation({
+        abide: {
+            patterns: {
+                no_forward_slash: '^((?!\/).)*$' 
+            }
+        }
+    });
     $('body').on('click', function(e) {
         Backbone.pubSub.trigger('context');
     });
