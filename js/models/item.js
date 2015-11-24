@@ -21,7 +21,6 @@ app.Item = Backbone.Model.extend({
         this.setName();
       }
 
-      this.set('department', department.replace('/','\\'));
     },
     setName: function () {
         this.set('name', this.get('firstName') + ' ' + this.get('lastName'));

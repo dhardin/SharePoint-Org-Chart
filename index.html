@@ -58,7 +58,7 @@
     <script type="text/template" id="item-template">
         <div class='node' node-id="<%=id%>">
             <h5><%=firstName%> <%=lastName%></h5>
-            <h5 class="subheader"><a href="#department/<%=department%>"><%=department%></a></h5>
+            <h5 class="subheader"><a href="#department/<%=encodeURI(department)%>"><%=department%></a></h5>
             <h6 class="subheader"><%=title%></h6>
             <div class="context vcard">
                 <a class="add">Add</a>
@@ -72,7 +72,7 @@
     <script type="text/template" id="item-blank-template">
         <div class='node' node-id="<%=id%>">
             <h5>BLANK</h5>
-            <h5 class="subheader"><a href="#department/<%=department%>"><%=department%></a></h5>
+            <h5 class="subheader"><a href="#department/<%= encodeURI(department)%>"><%=department%></a></h5>
             <h6 class="subheader"><%=title%></h6>
             <div class="context vcard">
                 <a class="link">Link</a>
@@ -124,7 +124,7 @@
                 </div>
                 <div class="large-12 columns">
                     <label>Department
-                        <input type="text" class="department" value="<%=department%>" pattern="no_forward_slash" <%=( app.config.editing ? '' : 'disabled' ) %>/>
+                        <input type="text" class="department" value="<%=department%>" <%=( app.config.editing ? '' : 'disabled' ) %>/>
                     </label>
                 </div>
                 <div class="large-12 columns">
@@ -191,13 +191,7 @@
     <!-- Router -->
     <script src="js/routes/routes.js"></script>
     <script>
-    $(document).foundation({
-        abide: {
-            patterns: {
-                no_forward_slash: '^((?!\/).)*$' 
-            }
-        }
-    });
+    $(document).foundation();
     $('body').on('click', function(e) {
         Backbone.pubSub.trigger('context');
     });
